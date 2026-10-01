@@ -14,18 +14,26 @@ import com.mediacontrol.scoreboard.core.VolumeStepFilter
 /**
  * Session-only volume: with `setPlaybackToRemote`, volume commands addressed to our session
  * arrive here instead of changing the phone's media volume. The COROS app sends its watch volume
- * presses as `MediaController.setVolumeTo` (absolute); hardware keys arrive as relative steps
- * while the scoreboard is the default volume session (screen off, another app in front).
- * Every real input counts as one volume input; the level springs back to the middle so the next
- * input in either direction is always a change.
+ * presses as `MediaController.setVolumeTo` (absolute levels); they always count.
+ *
+ * Relative steps are the phone's own volume keys, routed to this session because it is the
+ * playing session. With the scoreboard on screen they are reset presses (two needed). Otherwise
+ * the user is somewhere else, so they are passed on to the phone's media volume and never touch
+ * the score: the keys keep working normally in other apps and can't reset the score by accident.
  */
 internal class SessionVolumeProvider(
+    private val onScreen: () -> Boolean,
+    private val adjustPhoneVolume: (direction: Int) -> Unit,
     private val onInput: (description: String) -> Unit,
 ) : VolumeProvider(VOLUME_CONTROL_ABSOLUTE, MAX_LEVEL, MID_LEVEL) {
 
     private val steps = VolumeStepFilter()
 
     override fun onAdjustVolume(direction: Int) {
+        if (!onScreen()) {
+            if (direction != 0) adjustPhoneVolume(direction)
+            return
+        }
         // Key auto-repeat and the key-up echo (direction 0) of a held hardware key are one press.
         if (!steps.onStep(direction, SystemClock.uptimeMillis())) return
         onInput("volume %+d".format(direction))
@@ -48,15 +56,17 @@ internal class SessionVolumeProvider(
  * Watches the phone's real media volume (STREAM_MUSIC) through the platform's volume broadcasts.
  *
  * A watch app that changes the stream directly bypasses the session's [SessionVolumeProvider]. When
- * [restoring] is on, such a change is reported as a volume input and the previous level (and mute
- * state) is put back right away, so the phone's volume is never left modified. When it is off, the
- * change is only reported for diagnostics.
+ * [restoring] is on and the scoreboard is on screen, such a change is reported as a volume input
+ * and the previous level (and mute state) is put back right away, so the phone's volume is never
+ * left modified. Otherwise the change is the user's: it becomes the new level to restore to and is
+ * only reported for diagnostics.
  *
  * The broadcasts are not public API ([AudioManager] sends them as protected system broadcasts);
  * they have been stable for a decade but are treated as best effort.
  */
 internal class PhoneVolumeWatcher(
     private val context: Context,
+    private val onScreen: () -> Boolean,
     private val onChange: (description: String, restored: Boolean) -> Unit,
 ) {
     private val audio = context.getSystemService(AudioManager::class.java)
@@ -107,9 +117,10 @@ internal class PhoneVolumeWatcher(
 
     private fun onVolumeChanged(value: Int, previous: Int) {
         if (value < 0 || value == previous) return
-        if (restoring && value == baselineVolume) return // our own restore (or already at baseline)
-        onChange("phone volume $previous→$value", restoring)
-        if (restoring) {
+        val counts = restoring && onScreen()
+        if (counts && value == baselineVolume) return // our own restore (or already at baseline)
+        onChange("phone volume $previous→$value", counts)
+        if (counts) {
             runCatching { audio.setStreamVolume(AudioManager.STREAM_MUSIC, baselineVolume, 0) }
                 .onFailure { Log.w(TAG, "Could not restore media volume", it) }
         } else {
@@ -119,8 +130,9 @@ internal class PhoneVolumeWatcher(
 
     private fun onMuteChanged(muted: Boolean) {
         if (muted == baselineMuted) return // restore echo, or no actual change
-        onChange(if (muted) "phone mute" else "phone unmute", restoring)
-        if (restoring) {
+        val counts = restoring && onScreen()
+        onChange(if (muted) "phone mute" else "phone unmute", counts)
+        if (counts) {
             val direction = if (baselineMuted) AudioManager.ADJUST_MUTE else AudioManager.ADJUST_UNMUTE
             runCatching { audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, direction, 0) }
                 .onFailure { Log.w(TAG, "Could not restore media mute state", it) }

@@ -67,9 +67,11 @@ recreation and process restarts. Scores stop at 99.
    needs this for Media Control. Keep the COROS app running in the background.
    On Xiaomi/HyperOS, set the COROS app to *Battery saver: No restrictions* and allow
    *Autostart*.
-2. On HyperOS, also set **Scoreboard** to *Battery saver: No restrictions*, so its media service
-   survives long matches with the screen off. If you want *Show over the lock screen*, also allow
-   *Show on Lock screen* in the app's *Other permissions*.
+2. On HyperOS, also set **Scoreboard** to *Battery saver: No restrictions*. Without it HyperOS
+   freezes the app as soon as it is not on screen (screen off, another app in front), even with its
+   media service running, and watch buttons are only applied when you come back. Don't clear
+   Scoreboard from the recent apps during a match: HyperOS force-stops it. If you want *Show over
+   the lock screen*, also allow *Show on Lock screen* in the app's *Other permissions*.
 3. Open Scoreboard. A "Scoreboard" media notification appears and the session reports
    "playing". On the watch, open Media Control: Toolbox (long-press Back) → Media Control, or
    use the *Switch View* shortcut during an activity. It shows **0 : 0** as the title.
@@ -94,8 +96,10 @@ recreation and process restarts. Scores stop at 99.
   as one press, so it can never confirm a reset by itself.
 - Watches in "podcast mode" send skip back/forward instead of previous/next. Rewind, fast-forward
   and seeks map to left/right +1 the same way.
-- The phone's own volume keys work as reset presses too (same two-step rule). So do
-  headset/Bluetooth media keys and `adb shell cmd media_session dispatch next|previous|play-pause`.
+- While the scoreboard is on screen, the phone's own volume keys work as reset presses too (same
+  two-step rule). When the scoreboard is not in front (another app, screen off), they adjust the
+  phone's media volume as usual and never touch the score. Headset/Bluetooth media keys and
+  `adb shell cmd media_session dispatch next|previous|play-pause` work like the watch buttons.
 
 ## How it works
 
@@ -171,6 +175,10 @@ using a debug build that logged every input:
   phone-volume fallback is not needed for COROS and is off by default.
 - The COROS app picked the scoreboard's session throughout the test: every watch button and volume
   press arrived. This happened while no other media app was playing.
+- With the default battery setting, HyperOS froze the app whenever it was not on screen, even
+  while its media service ran: its timers stopped, and queued input was handled only once the app
+  was back in front. Phone volume keys pressed in other apps during that time reached the session.
+  Those keys now go to the phone's media volume instead of arming a reset.
 
 ## Known limitations
 
@@ -191,9 +199,10 @@ using a debug build that logged every input:
   trigger an undo.
 - **Reset is not undoable**: by requirement, reset clears the history, so both the on-screen and
   the remote reset need a deliberate second action.
-- **HyperOS**: aggressive battery management can kill background services. *Show over the lock
-  screen* needs the extra *Show on Lock screen* permission. Starting with Android 16, Android
-  ignores the fixed landscape orientation on large screens (tablets); phones are unaffected.
+- **HyperOS**: battery management freezes or force-stops background apps; see setup step 2.
+  *Show over the lock screen* needs the extra *Show on Lock screen* permission. Starting with
+  Android 16, Android ignores the fixed landscape orientation on large screens (tablets); phones
+  are unaffected.
 - **Future Android versions**: Android 17 restricts volume changes from apps without a visible
   activity or foreground service. This doesn't affect the Android 16 target phone, but it could
   stop COROS's own volume calls on newer phones.

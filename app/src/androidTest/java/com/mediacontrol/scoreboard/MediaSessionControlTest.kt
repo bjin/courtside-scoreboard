@@ -6,12 +6,14 @@ import android.media.session.MediaController
 import android.media.session.PlaybackState
 import android.os.SystemClock
 import android.view.KeyEvent
+import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.mediacontrol.scoreboard.core.InputSource
 import com.mediacontrol.scoreboard.ui.MainActivity
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -94,6 +96,30 @@ class MediaSessionControlTest {
 
         assertEquals(phoneVolume, audio.getStreamVolume(AudioManager.STREAM_MUSIC))
         assertEquals(MediaController.PlaybackInfo.PLAYBACK_TYPE_REMOTE, controller.playbackInfo.playbackType)
+    }
+
+    /** The phone's volume keys reach the session when the scoreboard is not in front. */
+    @Test
+    fun phoneVolumeKeysOutsideTheScoreboardAdjustThePhoneAndNeverArmAReset() {
+        val audio = app.getSystemService(AudioManager::class.java)
+        val before = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+        val up = before < audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        controller.transportControls.skipToNext()
+        awaitTitle("0 : 1")
+        activity.scenario.moveToState(Lifecycle.State.CREATED) // stopped: another app or screen off
+        try {
+            repeat(2) {
+                controller.adjustVolume(if (up) AudioManager.ADJUST_RAISE else AudioManager.ADJUST_LOWER, 0)
+                SystemClock.sleep(600)
+            }
+            waitFor("phone volume moved") {
+                true.takeIf { audio.getStreamVolume(AudioManager.STREAM_MUSIC) != before }
+            }
+            assertNull(app.controller.resetArmedUntil.value)
+            assertEquals("0 : 1", metadata(MediaMetadata.METADATA_KEY_TITLE))
+        } finally {
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, before, 0)
+        }
     }
 
     /** A watch app that sets the phone's media volume directly (bypassing the session). */

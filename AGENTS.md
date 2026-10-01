@@ -14,8 +14,8 @@ player and shows the score as the track title.
   access). Observed with COROS app 4.10.8: buttons arrive as media-button key-event pairs
   (`MEDIA_NEXT`, `MEDIA_PREVIOUS`, `MEDIA_PAUSE` while playing), and volume arrives as session
   `setVolumeTo(max)` bursts (≤6 calls, ≤90 ms apart). The phone's media volume is untouched.
-- HyperOS: battery restrictions can kill background services; `setShowWhenLocked` also needs the
-  "Show on Lock screen" permission.
+- HyperOS: with default battery settings it freezes the app whenever it is not on screen (despite
+  the FGS) and force-stops it when cleared from recents; `setShowWhenLocked` needs extra consent.
 
 ## Hard constraints
 - Only `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK`; no network, accounts,
@@ -44,9 +44,9 @@ player and shows the score as the track title.
     prev/next/play/pause; goes PAUSED→PLAYING on activity start to re-claim the top spot.
   - `onMediaButtonEvent` handled directly: the framework default delays play/pause and turns a
     double press into "next".
-  - Volume: `setPlaybackToRemote` with an absolute `VolumeProvider` that springs back to mid,
-    plus the opt-in `PhoneVolumeWatcher` fallback for other watches (hidden VOLUME_CHANGED /
-    STREAM_MUTE_CHANGED broadcasts; restores the baseline).
+  - Volume: `setPlaybackToRemote` with an absolute `VolumeProvider` that springs back to mid.
+    Relative steps (phone keys) count only while a screen is started (`ScreenRegistry.onScreen`),
+    otherwise they go to STREAM_MUSIC. Opt-in `PhoneVolumeWatcher` fallback for other watches.
   - The service stops only when the last screen closes (`ScreenRegistry`): a reopened screen
     starts before the old one is destroyed.
   - `SilentPulse` plays 0.3 s of silence, because Android routes media keys to the app that

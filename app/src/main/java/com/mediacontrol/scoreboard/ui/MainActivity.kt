@@ -126,7 +126,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
+        scoreboardApp.screens.started()
         ScoreboardService.start(this)
+    }
+
+    override fun onStop() {
+        scoreboardApp.screens.stopped()
+        super.onStop()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

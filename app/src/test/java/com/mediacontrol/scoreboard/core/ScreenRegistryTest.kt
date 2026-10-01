@@ -31,4 +31,24 @@ class ScreenRegistryTest {
         assertFalse(screens.closed(finishing = false))
         assertFalse(screens.closed(finishing = false))
     }
+
+    @Test
+    fun theScoreboardIsOnScreenOnlyBetweenStartAndStop() {
+        screens.opened()
+        assertFalse(screens.onScreen)
+        screens.started()
+        assertTrue(screens.onScreen)
+        screens.stopped() // another app in front, or screen off
+        assertFalse(screens.onScreen)
+    }
+
+    @Test
+    fun aReopenedScreenStaysOnScreenWhenTheOldOneStops() {
+        screens.opened()
+        screens.started()
+        screens.opened()
+        screens.started()
+        screens.stopped() // the old screen stops after the new one started
+        assertTrue(screens.onScreen)
+    }
 }

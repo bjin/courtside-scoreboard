@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaMetadata
 import android.media.session.MediaSession
 import android.media.session.PlaybackState
@@ -56,9 +57,17 @@ class ScoreboardService : Service() {
     private lateinit var session: MediaSession
     private lateinit var phoneVolume: PhoneVolumeWatcher
     private lateinit var silentPulse: SilentPulse
-    private val volumeProvider = SessionVolumeProvider { description ->
-        app.controller.onRemoteVolume(RemoteInput(description, caller = null))
-    }
+    private val volumeProvider = SessionVolumeProvider(
+        onScreen = { app.screens.onScreen },
+        adjustPhoneVolume = { direction ->
+            // Not adjustSuggestedStreamVolume: that would route the step back to this session.
+            runCatching {
+                getSystemService(AudioManager::class.java)
+                    .adjustStreamVolume(AudioManager.STREAM_MUSIC, direction, AudioManager.FLAG_SHOW_UI)
+            }.onFailure { Log.w(TAG, "Could not pass a volume key on to the phone", it) }
+        },
+        onInput = { description -> app.controller.onRemoteVolume(RemoteInput(description, caller = null)) },
+    )
 
     /** Reported playback position starts far from zero so "seek back" never clamps at 0. */
     private val positionOrigin = SystemClock.elapsedRealtime()
@@ -86,7 +95,7 @@ class ScoreboardService : Service() {
             )
             setSessionActivity(openScoreboardIntent())
         }
-        phoneVolume = PhoneVolumeWatcher(this) { description, restored ->
+        phoneVolume = PhoneVolumeWatcher(this, onScreen = { app.screens.onScreen }) { description, restored ->
             val input = RemoteInput(description, caller = null)
             if (restored) app.controller.onRemoteVolume(input) else app.controller.onIgnoredRemote(input)
         }
