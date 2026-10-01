@@ -1,0 +1,1 @@
+https://raw.githubusercontent.com/google/fonts/main/ofl/b612/B612-Bold.ttf (upstream https://github.com/polarsys/b612) - B612 Bold, subset to 0-9 : space

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "1 | 0": a white one and zero split by a yellow divider, inside the 66 dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M36,35 L43,35 L43,68 L48,68 L48,73 L29,73 L29,68 L35,68 L35,44 L29,47 L29,41 Z" />
+    <path
+        android:fillColor="#FFFFD600"
+        android:pathData="M52.5,37 L55.5,37 L55.5,71 L52.5,71 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M60,54 A10,19 0 1,0 80,54 A10,19 0 1,0 60,54 Z M66,54 A4,13 0 1,0 74,54 A4,13 0 1,0 66,54 Z" />
+</vector>
