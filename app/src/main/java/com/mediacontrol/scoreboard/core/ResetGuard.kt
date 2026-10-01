@@ -4,10 +4,12 @@ package com.mediacontrol.scoreboard.core
  * Two-step confirmation for resetting from a remote volume control.
  *
  * The first volume input arms the reset; a second, separate input within [windowMs] confirms it.
- * Inputs closer than [minGapMs] to the previous input belong to the same press: a held hardware
- * key auto-repeats (first repeat after ~500 ms, then every ~50 ms) and dragging a watch volume
- * slider emits a burst of steps. Such a burst can arm but never confirm, so only two deliberate,
- * separated presses reset the score. The arm window restarts with every input of the burst.
+ * Inputs closer than [minGapMs] to the previous input belong to the same press: the COROS app
+ * delivers one watch volume press as a burst of up to six calls at most ~90 ms apart, while
+ * deliberate presses measured 460 ms apart or more. Such a burst can arm but never confirm, so
+ * only two separate presses reset the score. The arm window restarts with every input of the
+ * burst. Held hardware keys are filtered before they get here ([VolumeStepFilter], key repeat
+ * counts), because their first auto-repeat comes only ~500 ms after the press.
  */
 class ResetGuard(
     private val windowMs: Long = DEFAULT_WINDOW_MS,
@@ -56,7 +58,7 @@ class ResetGuard(
 
     companion object {
         const val DEFAULT_WINDOW_MS = 5_000L
-        const val DEFAULT_MIN_GAP_MS = 650L
+        const val DEFAULT_MIN_GAP_MS = 300L
         private const val NEVER = Long.MIN_VALUE
     }
 }

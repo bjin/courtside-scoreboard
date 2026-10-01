@@ -11,7 +11,9 @@ import org.junit.Test
 
 class ResetGuardTest {
 
-    private val guard = ResetGuard(windowMs = 5_000, minGapMs = 650)
+    private val guard = ResetGuard()
+
+    private fun feed(vararg times: Long) = times.map { guard.onVolumeInput(it) }
 
     @Test
     fun twoSeparatePressesWithinTheWindowConfirm() {
@@ -24,29 +26,27 @@ class ResetGuardTest {
     }
 
     @Test
-    fun aHeldKeyThatAutoRepeatsNeverConfirms() {
-        // Hardware auto-repeat: first repeat after 500 ms, then every 50 ms.
-        val times = listOf(0L, 500L) + (550L..4_000L step 50)
-        val results = times.map { guard.onVolumeInput(it) }
-        assertEquals(ARMED, results.first())
-        assertTrue(results.drop(1).all { it == CONTINUED })
-        assertTrue(guard.isArmed(4_000))
+    fun aCorosVolumeBurstIsOnePress() {
+        // Field log, COROS app 4.10.8: one watch volume press = setVolumeTo bursts <= 90 ms apart.
+        assertEquals(listOf(ARMED, CONTINUED, CONTINUED, CONTINUED), feed(0, 27, 82, 93))
+        assertTrue(guard.isArmed(1_000))
+        assertEquals(listOf(CONFIRMED, CONTINUED, CONTINUED, CONTINUED), feed(1_146, 1_188, 1_223, 1_266))
+        assertFalse(guard.isArmed(1_300))
     }
 
     @Test
-    fun aSliderDragIsOnePressAndAPauseThenAnotherInputConfirms() {
-        assertEquals(ARMED, guard.onVolumeInput(0))
-        assertEquals(CONTINUED, guard.onVolumeInput(120))
-        assertEquals(CONTINUED, guard.onVolumeInput(240))
-        assertEquals(CONFIRMED, guard.onVolumeInput(1_200))
+    fun aQuickSecondPressConfirms() {
+        // Field log: a second watch press 649 ms after the first burst was ignored with the old
+        // 650 ms gap and the reset did not happen.
+        feed(0, 49, 88)
+        assertEquals(CONFIRMED, guard.onVolumeInput(737))
     }
 
     @Test
     fun theWindowRestartsWithEveryInputOfTheArmingPress() {
-        guard.onVolumeInput(0)
-        guard.onVolumeInput(400) // still the same press
-        assertEquals(5_400L, guard.armedUntil())
-        assertEquals(CONFIRMED, guard.onVolumeInput(5_399))
+        feed(0, 200)
+        assertEquals(5_200L, guard.armedUntil())
+        assertEquals(CONFIRMED, guard.onVolumeInput(5_199))
     }
 
     @Test
@@ -60,10 +60,8 @@ class ResetGuardTest {
     @Test
     fun theTailOfTheConfirmingPressDoesNotArmAgain() {
         guard.onVolumeInput(0)
-        assertEquals(CONFIRMED, guard.onVolumeInput(1_000))
-        assertEquals(CONTINUED, guard.onVolumeInput(1_500))
-        assertEquals(CONTINUED, guard.onVolumeInput(1_550))
-        assertFalse(guard.isArmed(1_600))
+        assertEquals(listOf(CONFIRMED, CONTINUED, CONTINUED), feed(1_000, 1_050, 1_100))
+        assertFalse(guard.isArmed(1_200))
         assertEquals(ARMED, guard.onVolumeInput(3_000))
     }
 

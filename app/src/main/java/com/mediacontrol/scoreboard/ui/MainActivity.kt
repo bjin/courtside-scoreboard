@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = scoreboardApp
+        app.screens.opened()
         val controller = app.controller
         val settingsStore = app.settings
         applyWindowSettings(settingsStore.settings.value)
@@ -134,7 +135,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        if (isFinishing) ScoreboardService.stop(this)
+        // A screen reopened right after leaving starts before this one is destroyed; only the last
+        // closing screen may end the session.
+        if (scoreboardApp.screens.closed(isFinishing)) ScoreboardService.stop(this)
         super.onDestroy()
     }
 

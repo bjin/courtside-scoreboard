@@ -46,9 +46,10 @@ data class Settings(
     val volumeReset: Boolean = true,
     /**
      * Also treat changes of the phone's real media volume as reset presses and put the volume
-     * back at once: covers watch apps that set the phone volume directly instead of the session's.
+     * back at once: for watch apps that set the phone volume directly instead of the session's.
+     * Off by default: the COROS app sends volume to the session, so this is not needed for it.
      */
-    val phoneVolumeFallback: Boolean = true,
+    val phoneVolumeFallback: Boolean = false,
     /** Play a short inaudible clip so media keys (headsets, BT remotes) are routed to this app. */
     val claimMediaButtons: Boolean = true,
 )

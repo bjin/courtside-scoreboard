@@ -6,23 +6,28 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.VolumeProvider
+import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.mediacontrol.scoreboard.core.VolumeStepFilter
 
 /**
  * Session-only volume: with `setPlaybackToRemote`, volume commands addressed to our session
- * (MediaController.adjustVolume/setVolumeTo, hardware keys while the scoreboard is focused or while
- * it is the default volume session) arrive here instead of changing the phone's media volume.
- * Every real step counts as one volume input; the level springs back to the middle so the next
- * step in either direction is always possible.
+ * arrive here instead of changing the phone's media volume. The COROS app sends its watch volume
+ * presses as `MediaController.setVolumeTo` (absolute); hardware keys arrive as relative steps
+ * while the scoreboard is the default volume session (screen off, another app in front).
+ * Every real input counts as one volume input; the level springs back to the middle so the next
+ * input in either direction is always a change.
  */
 internal class SessionVolumeProvider(
     private val onInput: (description: String) -> Unit,
 ) : VolumeProvider(VOLUME_CONTROL_ABSOLUTE, MAX_LEVEL, MID_LEVEL) {
 
+    private val steps = VolumeStepFilter()
+
     override fun onAdjustVolume(direction: Int) {
-        // Direction 0 (ADJUST_SAME) is the key-up echo of a hardware key press, not a new input.
-        if (direction == 0) return
+        // Key auto-repeat and the key-up echo (direction 0) of a held hardware key are one press.
+        if (!steps.onStep(direction, SystemClock.uptimeMillis())) return
         onInput("volume %+d".format(direction))
         currentVolume = MID_LEVEL
     }

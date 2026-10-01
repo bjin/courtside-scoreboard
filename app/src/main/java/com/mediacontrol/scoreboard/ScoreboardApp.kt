@@ -8,6 +8,7 @@ import android.os.Looper
 import android.os.SystemClock
 import com.mediacontrol.scoreboard.core.Cancellable
 import com.mediacontrol.scoreboard.core.DelayedRunner
+import com.mediacontrol.scoreboard.core.ScreenRegistry
 import com.mediacontrol.scoreboard.core.ScoreboardController
 import com.mediacontrol.scoreboard.data.PrefsScoreStore
 import com.mediacontrol.scoreboard.data.SettingsStore
@@ -21,6 +22,9 @@ class ScoreboardApp : Application() {
 
     /** Token of the live MediaSession while [com.mediacontrol.scoreboard.media.ScoreboardService] runs. */
     val sessionToken = MutableStateFlow<MediaSession.Token?>(null)
+
+    /** Open scoreboard screens; decides when the session service may stop. Main thread only. */
+    val screens = ScreenRegistry()
 
     override fun onCreate() {
         super.onCreate()

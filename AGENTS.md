@@ -11,9 +11,9 @@ player and shows the score as the track title.
   Sizes come from the actual window, so 16:9–21:9 phones at any density must also fit without
   clipping or touching display cutouts.
 - Watch: COROS APEX 4 via the COROS Android app (`com.yf.smart.coros.dist`, needs notification
-  access). Media Control shows the title, prev/next (skip ±s in podcast mode), play/pause, and a
-  volume window (slider, mute). The COROS APK is packed, so its volume API is unknown; keep both
-  volume paths below.
+  access). Observed with COROS app 4.10.8: buttons arrive as media-button key-event pairs
+  (`MEDIA_NEXT`, `MEDIA_PREVIOUS`, `MEDIA_PAUSE` while playing), and volume arrives as session
+  `setVolumeTo(max)` bursts (≤6 calls, ≤90 ms apart). The phone's media volume is untouched.
 - HyperOS: battery restrictions can kill background services; `setShowWhenLocked` also needs the
   "Show on Lock screen" permission.
 
@@ -29,8 +29,8 @@ player and shows the score as the track title.
 - `core/` is pure Kotlin (only compile-time `KeyEvent` constants), unit-tested on the JVM:
   - `ScoreState`: undo history per team (A/B), score replayed from it; swap only flips the
     display mapping; scores cap at 99.
-  - `ResetGuard`: two separate volume presses; the second at least 650 ms after the previous
-    input and within 5 s. Held keys and slider bursts never confirm.
+  - `ResetGuard`: two separate volume presses; the second at least 300 ms after the previous
+    input and within 5 s. Bursts never confirm; `VolumeStepFilter` folds held-key repeats.
   - `MediaCommandMapping`: prev/rewind/skip-back/seek ≥1 s back = left +1;
     next/fast-forward/skip-forward/seek ≥1 s forward = right +1; play, pause, play/pause,
     headset hook = undo; stop ignored; only the initial key-down counts.
@@ -45,8 +45,10 @@ player and shows the score as the track title.
   - `onMediaButtonEvent` handled directly: the framework default delays play/pause and turns a
     double press into "next".
   - Volume: `setPlaybackToRemote` with an absolute `VolumeProvider` that springs back to mid,
-    plus the `PhoneVolumeWatcher` fallback (hidden VOLUME_CHANGED / STREAM_MUTE_CHANGED
-    broadcasts; restores the baseline).
+    plus the opt-in `PhoneVolumeWatcher` fallback for other watches (hidden VOLUME_CHANGED /
+    STREAM_MUTE_CHANGED broadcasts; restores the baseline).
+  - The service stops only when the last screen closes (`ScreenRegistry`): a reopened screen
+    starts before the old one is destroyed.
   - `SilentPulse` plays 0.3 s of silence, because Android routes media keys to the app that
     last played audio.
   - The MediaStyle notification carries the session token (exempt from POST_NOTIFICATIONS).
@@ -79,7 +81,7 @@ adb shell wm size 1200x2608; adb shell wm density 440   # target; 1080x1920 = 16
 adb shell cmd overlay enable-exclusive --category com.android.internal.display.cutout.emulation.tall
 adb shell cmd media_session dispatch next              # previous | play-pause
 adb shell dumpsys media_session    # state=PLAYING, volumeType=REMOTE, description=<L : R>, <status>
-adb shell input keyevent KEYCODE_VOLUME_UP              # twice, >= 0.65 s apart = reset
+adb shell input keyevent KEYCODE_VOLUME_UP              # twice, >= 0.3 s apart = reset
 adb exec-out screencap -p > shot.png
 adb shell uiautomator dump /sdcard/ui.xml               # control bounds via content descriptions
 ```
@@ -87,8 +89,7 @@ adb shell uiautomator dump /sdcard/ui.xml               # control bounds via con
   clip played (setting "Receive media buttons").
 - On API 37 `cmd media_session volume --set` has no effect; the phone-volume fallback is covered
   by the instrumented test.
-- Under `wm size` overrides the cutout the app receives differs from `dumpsys window`; trust the
-  app-side values.
+- Under `wm size` overrides the cutout the app gets differs from `dumpsys window`; trust the app.
 - Keep `res/mipmap-anydpi-v26`: lint's ObsoleteSdkInt hint is wrong, and moving it breaks
   resource linking.
 - `ComponentActivity.dispatchKeyEvent` is restricted API; override `onKeyDown`/`onKeyUp` instead.

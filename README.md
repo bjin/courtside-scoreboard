@@ -83,7 +83,7 @@ recreation and process restarts. Scores stop at 99.
 | ⏮ Previous | **Left +1** |
 | ⏭ Next | **Right +1** |
 | ⏯ Play / Pause | **Undo** the last point (repeatable) |
-| Volume window: any volume step, slider move or mute, **twice** (pause ≥ 0.65 s in between, second within 5 s) | **Reset to 0 : 0** |
+| Volume window: any volume step, slider move or mute, **twice** (pause ≥ 0.3 s in between, second within 5 s) | **Reset to 0 : 0** |
 
 - The title on the watch is always the score, e.g. `11 : 9`. The artist/subtitle line shows the
   last action (`Right +1`, `Undo`, `Volume again = RESET`, `Reset to 0 : 0`, …). Both update
@@ -116,7 +116,8 @@ recreation and process restarts. Scores stop at 99.
   - Media button events are handled directly, without the framework's 300 ms play/pause
     double-tap delay, which would also turn two quick undos into "next".
   - Volume uses `setPlaybackToRemote` with an absolute `VolumeProvider` (0–10, springs back to 5).
-    Volume sent to the session is captured and never changes the phone's real volume.
+    Volume sent to the session is captured and never changes the phone's real volume. A burst of
+    calls less than 0.3 s apart counts as one press; a held hardware key is one press until key-up.
   - A MediaStyle notification carries the session token. This also covers controllers that find
     sessions through notifications. Media-session notifications don't need the notification
     permission.
@@ -154,33 +155,35 @@ the figure height. On the target phone the digits are about 700 px (≈ 41 mm) t
 Only `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK`. The app has no network access,
 no accounts, no analytics, no ads, and no runtime permission prompts.
 
+## Field-tested behaviour (COROS APEX 4)
+
+Tested on the target phone (Xiaomi, HyperOS 3 / Android 16, 2608×1200) with COROS app 4.10.8,
+using a debug build that logged every input:
+
+- **Buttons** arrive from the COROS app (`com.yf.smart.coros.dist`) as media-button key events on
+  the scoreboard's session, as a down/up pair a few milliseconds apart: `MEDIA_PREVIOUS`,
+  `MEDIA_NEXT`, and `MEDIA_PAUSE` for play/pause (the session always reports playing). They never
+  arrive as transport-control calls such as `skipToNext()`. Each key took at most 8 ms from
+  arrival to the updated watch title.
+- **Volume** arrives as `MediaController.setVolumeTo` on the session. Every watch volume press sent
+  the session's maximum level (10), as a burst of 1–6 calls at most ~90 ms apart. The phone's own
+  media volume never changed. So the session volume path is what makes watch reset work. The
+  phone-volume fallback is not needed for COROS and is off by default.
+- The COROS app picked the scoreboard's session throughout the test: every watch button and volume
+  press arrived. This happened while no other media app was playing.
+
 ## Known limitations
 
-- **Not tested with a real watch.** Everything above was verified on an Android emulator
-  (API 37, app targeting API 36 like the Android 16 / HyperOS target phone). That includes
-  MediaController transport controls, media keys, session volume, the phone-volume fallback,
-  screen-off operation, and process restarts. The COROS app's code is packed by a protector, so
-  how it talks to sessions could not be inspected. Its manifest shows that it uses a
-  notification listener, which suggests `getActiveSessions()` + `MediaController`. Open
-  **⋯ → Recent remote commands** to see exactly what your watch sends, for example
-  `skipToNext → Right +1 · com.yf.smart.coros.dist`.
-- **Watch volume is the least certain part.**
-  - If the COROS app sends volume to the session (`MediaController.setVolumeTo/adjustVolume`),
-    the scoreboard captures it and the phone's volume never changes.
-  - If it changes the phone's media volume directly, the fallback *Also use phone media-volume
-    changes* (on by default) notices the change and counts it as a press. It then restores the
-    previous volume right away, so the phone volume is never left modified. The fallback relies
-    on Android's non-public volume-change broadcasts.
-  - A step in a direction where the volume is already at its limit (0 or max) changes nothing
-    and cannot be detected; use the other direction.
-  - While the fallback is on, the phone's media volume can't be changed; turn the fallback off
-    in the menu if you need to. Turning off *Watch volume resets the score* returns volume to
-    normal behaviour.
-  - Android drops mute commands for remote sessions. A watch mute only counts if the COROS app
-    sends it as volume 0 or as a phone-volume mute.
-  - If volume doesn't reach the app on your phone, reset is still available on the phone
-    (hold RESET, or press a phone volume key twice). You can also press Undo on the watch
-    repeatedly.
+- **Mute on the watch** was not tested. Android drops mute commands for remote sessions, so a
+  watch mute counts only if the COROS app sends it as `setVolumeTo(0)`.
+- **Unverified volume paths.** Other watches may change the phone's media volume directly. For
+  those, turn on *Also use phone media-volume changes*. It counts each change as a press and puts
+  the volume back at once, relying on Android's non-public volume-change broadcasts. While it is
+  on, the phone's media volume can't be changed.
+- If volume doesn't reach the app, reset is still available on the phone: hold RESET, or press a
+  phone volume key twice. You can also press Undo on the watch repeatedly.
+- **Diagnostics**: **⋯ → Recent remote commands** shows what arrives and from which app, for
+  example `key MEDIA_NEXT → Right +1 · com.yf.smart.coros.dist`.
 - **Session selection**: if several media sessions exist, which one the watch controls is up to
   the COROS app. Keep other players stopped. The scoreboard re-claims the top spot whenever it
   comes to the front.
