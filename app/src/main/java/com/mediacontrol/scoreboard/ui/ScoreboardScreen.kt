@@ -118,7 +118,7 @@ private val EDGE_GUARD = 24.dp
 
 /** Divider bar width, as a fraction of the window width (it sits in the gap between the scores). */
 private const val DIVIDER_FRACTION = 0.012f
-private const val FLASH_MS = 900
+private const val FLASH_MS = 1_200
 private const val MESSAGE_MS = 2_000L
 
 /** A press longer than this is a hold (hand resting on the phone), not a score tap. */

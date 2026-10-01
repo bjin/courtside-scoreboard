@@ -9,12 +9,12 @@ class WatchTitleTest {
 
     @Test
     fun theMarkSitsBesideTheSideThatServesNext() {
-        assertEquals("0 : 0", watchTitle(ScoreState.EMPTY, markServer = true))
+        assertEquals("○ 0 : 0 ○", watchTitle(ScoreState.EMPTY, markServer = true))
         val state = ScoreState.EMPTY.points(Side.LEFT, Side.RIGHT, Side.RIGHT)
-        assertEquals("1 : 2●", watchTitle(state, markServer = true))
-        assertEquals("●1 : 0", watchTitle(state.undo().undo(), markServer = true))
+        assertEquals("○ 1 : 2 ●", watchTitle(state, markServer = true))
+        assertEquals("● 1 : 0 ○", watchTitle(state.undo().undo(), markServer = true))
         // Teams change ends: the mark follows the team that won the last point.
-        assertEquals("●2 : 1", watchTitle(state.swapSides(), markServer = true))
+        assertEquals("● 2 : 1 ○", watchTitle(state.swapSides(), markServer = true))
     }
 
     @Test

@@ -23,7 +23,7 @@ player and shows the score as the track title.
 - A score tap is one finger, no drag beyond touch slop, at most 0.8 s. It never starts on a
   message, in a control's 1.5× zone, or within 24 dp of the rounded display edge (`TapGuard`).
 - Reset returns to 0 : 0, clears the undo history, and always needs a deliberate second action.
-- Metadata title `L : R` (`●` beside the serving side) is updated after every change and at startup.
+- Metadata title `● L : R ○` (`●` = serving side) is updated after every change and at startup.
 
 ## Key design choices
 - `core/` is pure Kotlin (only compile-time `KeyEvent` constants), unit-tested on the JVM:

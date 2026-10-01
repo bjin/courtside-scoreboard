@@ -53,7 +53,7 @@ data class Palette(
             divider = Color(0xFFA6A6A6),
             control = Color(0xFF555555),
             controlDisabled = Color(0xFFC4C4C4),
-            pointFlash = Color(0xFFFF9800),
+            pointFlash = Color(0xFF2196F3),
             warnFlash = Color(0xFFFF6E6E),
             pill = Color(0xFFE6E6E6),
             onPill = Color.Black,

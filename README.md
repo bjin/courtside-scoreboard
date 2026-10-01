@@ -79,7 +79,7 @@ recreation and process restarts. Scores stop at 99.
    the lock screen*, also allow *Show on Lock screen* in the app's *Other permissions*.
 3. Open Scoreboard. A "Scoreboard" media notification appears and the session reports
    "playing". On the watch, open Media Control: Toolbox (long-press Back) → Media Control, or
-   use the *Switch View* shortcut during an activity. It shows **0 : 0** as the title.
+   use the *Switch View* shortcut during an activity. It shows **○ 0 : 0 ○** as the title.
 4. Don't play music on the same phone during the match. The watch controls the active media
    session, so another player could take over. Bringing Scoreboard to the front re-claims it.
 
@@ -93,10 +93,11 @@ recreation and process restarts. Scores stop at 99.
 | Volume window: any volume step, slider move or mute, **twice** (pause ≥ 0.3 s in between, second within 5 s) | **Reset to 0 : 0** |
 
 - The title on the watch is the score, with ● beside the side that won the last point and serves
-  next: `●11 : 9` or `11 : 9●`. There is no mark at 0 : 0, or when *Highlight the side that won
-  the last point* is off in the menu. The artist/subtitle line shows the last action
-  (`Right +1`, `Undo`, `Volume again = RESET`, `Reset to 0 : 0`, …). Both update immediately
-  after every change and when the app starts.
+  next and ○ at the other end, so the colon stays in place: `● 11 : 9 ○` or `○ 11 : 9 ●`
+  (`○ 0 : 0 ○` before the first point). The spaces keep a circle from reading as a 0. With
+  *Highlight the side that won the last point* off in the menu, the title is just `11 : 9`. The
+  artist/subtitle line shows the last action (`Right +1`, `Undo`, `Volume again = RESET`,
+  `Reset to 0 : 0`, …). Both update immediately after every change and when the app starts.
 - The first volume input only *arms* the reset. The phone then shows a red
   "RESET? Press volume again (5)" banner and the watch subtitle reads `Volume again = RESET`.
   Any other command cancels the armed reset. One continuous slider drag, or a held key, counts
