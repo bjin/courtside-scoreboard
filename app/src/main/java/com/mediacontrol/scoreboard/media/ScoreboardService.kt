@@ -65,6 +65,13 @@ class ScoreboardService : Service() {
     private var lastNotificationAt = 0L
     private val notifyRunnable = Runnable { postNotification() }
 
+    /** Latest (score, feedback, armed) waiting to be published; see [observe]. */
+    private var pendingMetadata: Triple<ScoreState, Feedback?, Boolean>? = null
+    private val metadataRunnable = Runnable {
+        pendingMetadata?.let { (state, feedback, armed) -> publishMetadata(state, feedback, armed) }
+        pendingMetadata = null
+    }
+
     override fun onCreate() {
         super.onCreate()
         session = MediaSession(this, TAG).apply {
@@ -112,6 +119,7 @@ class ScoreboardService : Service() {
     override fun onDestroy() {
         scope.cancel()
         handler.removeCallbacks(notifyRunnable)
+        handler.removeCallbacks(metadataRunnable)
         phoneVolume.stop()
         silentPulse.release()
         app.sessionToken.value = null
@@ -127,8 +135,12 @@ class ScoreboardService : Service() {
         scope.launch {
             combine(controller.state, controller.feedback, controller.resetArmedUntil) { state, feedback, armed ->
                 Triple(state, feedback, armed != null)
-            }.collect { (state, feedback, armed) ->
-                publishMetadata(state, feedback, armed)
+            }.collect { latest ->
+                // One action changes score, feedback and arm state one after another on this thread.
+                // Publishing once, right after the action, gives the watch a single consistent update
+                // instead of a burst with intermediate subtitles.
+                if (pendingMetadata == null) handler.post(metadataRunnable)
+                pendingMetadata = latest
                 scheduleNotification()
             }
         }
