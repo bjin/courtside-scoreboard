@@ -46,6 +46,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -196,8 +197,9 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
             }
         }
 
-        // Layer 2: divider and digits (drawing only, never consumes touches).
-        Canvas(Modifier.fillMaxSize()) {
+        // Layer 2: divider and digits (drawing only, never consumes touches). Its own graphics
+        // layer keeps the digit outlines from being re-recorded on every highlight animation frame.
+        Canvas(Modifier.fillMaxSize().graphicsLayer()) {
             val dividerWidth = size.width * DIVIDER_FRACTION
             drawRect(
                 color = palette.divider,
