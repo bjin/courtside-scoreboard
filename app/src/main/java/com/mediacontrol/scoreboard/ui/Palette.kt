@@ -49,7 +49,7 @@ data class Palette(
         val Light = Palette(
             background = Color.White,
             digits = Color.Black,
-            serveTint = Color(0xFFFFE500),
+            serveTint = Color(0xFF90CAF9),
             divider = Color(0xFFA6A6A6),
             control = Color(0xFF555555),
             controlDisabled = Color(0xFFC4C4C4),

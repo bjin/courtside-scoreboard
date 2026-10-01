@@ -10,8 +10,9 @@ as the phone's active media player, and the watch displays the score as the trac
 | ![](docs/screenshots/2608x1200-dark.png) | ![](docs/screenshots/1920x1080-dark.png) | ![](docs/screenshots/2400x1080-dark.png) |
 | ![](docs/screenshots/2608x1200-light.png) | ![](docs/screenshots/1920x1080-light.png) | ![](docs/screenshots/2400x1080-light.png) |
 
-The half that won the last point is tinted (blue on dark, yellow on light). In badminton the
-rally winner serves next, so the tint shows who is serving.
+The half that won the last point is tinted (dark blue on dark, light blue on light). In badminton
+the rally winner serves next, so the tint shows who is serving. The watch title marks the same
+side with ●.
 
 ## Build and install
 
@@ -43,10 +44,14 @@ Tests:
 
 - **Tap the left or right half** to add a point to that side. Only a clean one-finger tap counts.
   Swipes (for example to reveal the system bars), holds longer than 0.8 s, multi-finger
-  contact and touches on any control or message never count.
+  contact and touches on any control or message never count. Neither do touches that start
+  within 24 dp (about 4 mm) of the screen edge or its rounded corners, or close to a button (in a
+  zone 1.5 times the button's size): a hand holding the phone or a slightly missed button adds
+  no point.
 - **UNDO** (bottom centre) reverses the last point. Repeat it to step back through the whole match.
-- **RESET**: hold it for about 1 s (the button fills up) to return to 0 : 0 and clear the history.
-  A short tap only shows a hint.
+- **RESET**: hold it for 0.6 s to return to 0 : 0 and clear the history. While you hold, the
+  screen fills with red from the bottom; the score resets when it is full. A short tap only shows
+  a hint.
 - **SWAP**: use it when the teams change ends. The scores, the serve tint and the undo history
   follow the teams.
 - **◐** (top-left) switches the light/dark background; the choice is remembered.
@@ -87,9 +92,11 @@ recreation and process restarts. Scores stop at 99.
 | ⏯ Play / Pause | **Undo** the last point (repeatable) |
 | Volume window: any volume step, slider move or mute, **twice** (pause ≥ 0.3 s in between, second within 5 s) | **Reset to 0 : 0** |
 
-- The title on the watch is always the score, e.g. `11 : 9`. The artist/subtitle line shows the
-  last action (`Right +1`, `Undo`, `Volume again = RESET`, `Reset to 0 : 0`, …). Both update
-  immediately after every change and when the app starts.
+- The title on the watch is the score, with ● beside the side that won the last point and serves
+  next: `●11 : 9` or `11 : 9●`. There is no mark at 0 : 0, or when *Highlight the side that won
+  the last point* is off in the menu. The artist/subtitle line shows the last action
+  (`Right +1`, `Undo`, `Volume again = RESET`, `Reset to 0 : 0`, …). Both update immediately
+  after every change and when the app starts.
 - The first volume input only *arms* the reset. The phone then shows a red
   "RESET? Press volume again (5)" banner and the watch subtitle reads `Volume again = RESET`.
   Any other command cancels the armed reset. One continuous slider drag, or a held key, counts
@@ -108,7 +115,8 @@ recreation and process restarts. Scores stop at 99.
     from that history, so the history can never disagree with the score.
   - `ResetGuard` implements the two-step volume reset. `MediaCommandMapping` maps keys,
     transport controls and seeks to commands.
-  - `ScoreLayout` does the digit-fitting geometry.
+  - `ScoreLayout` does the digit-fitting geometry. `TapGuard` decides where a touch may score,
+    and `watchTitle` builds the watch title with its serve mark.
 - `ScoreboardController` owns the score. Touch, MediaSession callbacks and volume all run
   through it on the main thread, and it saves the history (SharedPreferences) on every change.
 - `media/ScoreboardService` is a `mediaPlayback` foreground service with a framework

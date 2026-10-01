@@ -26,8 +26,8 @@ import com.mediacontrol.scoreboard.R
 import com.mediacontrol.scoreboard.core.ActionKind
 import com.mediacontrol.scoreboard.core.Feedback
 import com.mediacontrol.scoreboard.core.RemoteInput
-import com.mediacontrol.scoreboard.core.ScoreState
 import com.mediacontrol.scoreboard.core.Side
+import com.mediacontrol.scoreboard.core.watchTitle
 import com.mediacontrol.scoreboard.scoreboardApp
 import com.mediacontrol.scoreboard.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -74,10 +74,10 @@ class ScoreboardService : Service() {
     private var lastNotificationAt = 0L
     private val notifyRunnable = Runnable { postNotification() }
 
-    /** Latest (score, feedback, armed) waiting to be published; see [observe]. */
-    private var pendingMetadata: Triple<ScoreState, Feedback?, Boolean>? = null
+    /** What the watch shows, waiting to be published as one update; see [observe]. */
+    private var pendingMetadata: Published? = null
     private val metadataRunnable = Runnable {
-        pendingMetadata?.let { (state, feedback, armed) -> publishMetadata(state, feedback, armed) }
+        pendingMetadata?.let(::publishMetadata)
         pendingMetadata = null
     }
 
@@ -103,7 +103,7 @@ class ScoreboardService : Service() {
 
         val settings = app.settings.settings.value
         applyVolumeMode(settings.volumeReset)
-        publishMetadata(app.controller.state.value, app.controller.feedback.value, armed = false)
+        publishMetadata(Published(currentTitle(), app.controller.feedback.value, armed = false))
         publishPlaybackState(PlaybackState.STATE_PLAYING)
         session.isActive = true
         goForeground()
@@ -142,8 +142,13 @@ class ScoreboardService : Service() {
     private fun observe() {
         val controller = app.controller
         scope.launch {
-            combine(controller.state, controller.feedback, controller.resetArmedUntil) { state, feedback, armed ->
-                Triple(state, feedback, armed != null)
+            combine(
+                controller.state,
+                controller.feedback,
+                controller.resetArmedUntil,
+                app.settings.settings.map { it.highlightServer }.distinctUntilChanged(),
+            ) { state, feedback, armed, markServer ->
+                Published(watchTitle(state, markServer), feedback, armed != null)
             }.collect { latest ->
                 // One action changes score, feedback and arm state one after another on this thread.
                 // Publishing once, right after the action, gives the watch a single consistent update
@@ -187,13 +192,12 @@ class ScoreboardService : Service() {
         }
     }
 
-    private fun publishMetadata(state: ScoreState, feedback: Feedback?, armed: Boolean) {
-        val title = scoreTitle(state)
-        val status = statusLine(feedback, armed)
+    private fun publishMetadata(published: Published) {
+        val status = statusLine(published.feedback, published.armed)
         session.setMetadata(
             MediaMetadata.Builder()
-                .putString(MediaMetadata.METADATA_KEY_TITLE, title)
-                .putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, title)
+                .putString(MediaMetadata.METADATA_KEY_TITLE, published.title)
+                .putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, published.title)
                 .putString(MediaMetadata.METADATA_KEY_ARTIST, status)
                 .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, status)
                 .putString(MediaMetadata.METADATA_KEY_ALBUM, getString(R.string.app_name))
@@ -221,7 +225,7 @@ class ScoreboardService : Service() {
             null
         }
 
-    private fun scoreTitle(state: ScoreState) = getString(R.string.score_title, state.left, state.right)
+    private fun currentTitle() = watchTitle(app.controller.state.value, app.settings.settings.value.highlightServer)
 
     private fun statusLine(feedback: Feedback?, armed: Boolean): String = getString(
         when {
@@ -285,10 +289,9 @@ class ScoreboardService : Service() {
                 },
             )
         }
-        val state = app.controller.state.value
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_scoreboard)
-            .setContentTitle(scoreTitle(state))
+            .setContentTitle(currentTitle())
             .setContentText(getString(R.string.notification_text))
             .setContentIntent(openScoreboardIntent())
             .setOngoing(true)
@@ -311,6 +314,9 @@ class ScoreboardService : Service() {
         Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
+
+    /** Score title (with the serve mark), last action and reset arm state, as the watch shows them. */
+    private data class Published(val title: String, val feedback: Feedback?, val armed: Boolean)
 
     companion object {
         private const val TAG = "ScoreboardService"

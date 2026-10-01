@@ -3,6 +3,7 @@ package com.mediacontrol.scoreboard.ui
 import android.os.SystemClock
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -48,6 +50,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -68,6 +72,7 @@ import com.mediacontrol.scoreboard.core.InputSource
 import com.mediacontrol.scoreboard.core.ScoreLayout
 import com.mediacontrol.scoreboard.core.ScoreState
 import com.mediacontrol.scoreboard.core.Side
+import com.mediacontrol.scoreboard.core.TapGuard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -108,6 +113,9 @@ private val TEXT_CONTROL_WIDTH = 92.dp
 private val EDGE = 8.dp
 private val CONTROL_SHAPE = RoundedCornerShape(12.dp)
 
+/** A touch that goes down closer than this to the display's edge or rounded corners never scores. */
+private val EDGE_GUARD = 24.dp
+
 /** Divider bar width, as a fraction of the window width (it sits in the gap between the scores). */
 private const val DIVIDER_FRACTION = 0.012f
 private const val FLASH_MS = 900
@@ -115,7 +123,9 @@ private const val MESSAGE_MS = 2_000L
 
 /** A press longer than this is a hold (hand resting on the phone), not a score tap. */
 private const val MAX_TAP_MS = 800L
-private const val HOLD_TO_RESET_MS = 900L
+
+/** Holding RESET this long resets; meanwhile the screen fills up from the bottom. */
+private const val HOLD_TO_RESET_MS = 600L
 
 @Composable
 fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardActions) {
@@ -127,6 +137,8 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
     val message = remember { TransientMessage() }
     val flashes = rememberSideFlashes(ui.feedback, palette)
     val server = if (ui.highlightServer) ui.score.lastPointSide else null
+    val tapGuard = remember { TapGuard() }
+    val resetHold = remember { Animatable(0f) }
 
     val feedback = ui.feedback
     val feedbackText = feedback?.let { feedbackMessage(it) }
@@ -158,9 +170,11 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
                 cutouts = safe.cutoutRects,
             )
         }
+        val edgeGuard = with(density) { EDGE_GUARD.toPx() }
+        SideEffect { tapGuard.setDisplay(width.toFloat(), height.toFloat(), safe.cornerRadii, edgeGuard) }
 
-        // Layer 1: the two tap halves. They paint the serving-side tint and the change flash
-        // behind the digits.
+        // Layer 1: the two tap halves. They paint the serving-side tint, the change flash and the
+        // RESET hold fill behind the digits.
         Row(Modifier.fillMaxSize()) {
             for (side in Side.entries) key(side) {
                 val flash = flashes.of(side)
@@ -183,8 +197,13 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
                         .drawBehind {
                             val alpha = flash.alpha.value
                             if (alpha > 0f) drawRect(flash.color, alpha = alpha)
+                            val hold = resetHold.value
+                            if (hold > 0f) {
+                                val top = size.height * (1f - hold)
+                                drawRect(palette.warnFlash, topLeft = Offset(0f, top), size = Size(size.width, size.height - top))
+                            }
                         }
-                        .scoreTaps(onTap)
+                        .scoreTaps(originX = if (side == Side.LEFT) 0f else geometry.dividerX, guard = tapGuard, onTap = onTap)
                         .semantics {
                             contentDescription = description
                             if (side == server) stateDescription = servingText
@@ -215,7 +234,8 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
             }
         }
 
-        // Layer 3: controls. Each consumes its own touches, so they never count as score taps.
+        // Layer 3: controls. Each consumes its own touches, so they never count as score taps, and
+        // records a no-score zone around itself for touches that slightly miss it.
         val (topLeftX, topLeftY) = corners.getValue(Corner.TOP_LEFT)
         IconControl(
             description = stringResource(R.string.cd_toggle_theme),
@@ -223,7 +243,8 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
             onClick = actions.toggleTheme,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .offset { IntOffset(topLeftX.roundToInt(), topLeftY.roundToInt()) },
+                .offset { IntOffset(topLeftX.roundToInt(), topLeftY.roundToInt()) }
+                .noScoreZone(tapGuard, "theme"),
         ) { drawThemeIcon(it) }
 
         val (topRightX, topRightY) = corners.getValue(Corner.TOP_RIGHT)
@@ -233,7 +254,8 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
             onClick = actions.openMenu,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .offset { IntOffset(-topRightX.roundToInt(), topRightY.roundToInt()) },
+                .offset { IntOffset(-topRightX.roundToInt(), topRightY.roundToInt()) }
+                .noScoreZone(tapGuard, "menu"),
         ) { drawMenuIcon(it) }
 
         Row(
@@ -249,6 +271,7 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
                     haptic(HapticFeedbackConstants.VIRTUAL_KEY)
                     actions.swap()
                 },
+                modifier = Modifier.noScoreZone(tapGuard, "swap"),
             )
             TextControl(
                 label = stringResource(R.string.action_undo),
@@ -257,15 +280,18 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
                     haptic(HapticFeedbackConstants.VIRTUAL_KEY)
                     actions.undo()
                 },
+                modifier = Modifier.noScoreZone(tapGuard, "undo"),
             )
             HoldToResetControl(
                 label = stringResource(R.string.action_reset),
-                palette = palette,
+                color = palette.control,
+                progress = resetHold,
                 onHeld = {
                     haptic(HapticFeedbackConstants.LONG_PRESS)
                     actions.reset()
                 },
                 onTooShort = { message.show(scope, holdHint) },
+                modifier = Modifier.noScoreZone(tapGuard, "reset"),
             )
         }
 
@@ -308,27 +334,36 @@ private fun feedbackMessage(feedback: Feedback): String? {
 /**
  * A score tap is a single finger going down and up within [MAX_TAP_MS] without moving beyond touch
  * slop. Swipes (e.g. revealing the system bars), long holds, multi-finger contact and gestures the
- * system cancels are ignored, which filters most accidental touches when handling the phone.
+ * system cancels are ignored, which filters most accidental touches when handling the phone. So
+ * are touches that go down where [guard] refuses them: at the display's edge or next to a control.
+ * [originX] is where this half starts in the window.
  */
-private fun Modifier.scoreTaps(onTap: () -> Unit): Modifier = pointerInput(Unit) {
-    val slop = viewConfiguration.touchSlop
-    awaitEachGesture {
-        val down = awaitFirstDown(requireUnconsumed = true)
-        var valid = true
-        while (true) {
-            val event = awaitPointerEvent()
-            if (event.changes.size > 1) valid = false
-            val change = event.changes.firstOrNull { it.id == down.id } ?: break
-            if (change.isConsumed || (change.position - down.position).getDistance() > slop) valid = false
-            if (!change.pressed) {
-                if (valid && change.uptimeMillis - down.uptimeMillis <= MAX_TAP_MS) {
-                    change.consume()
-                    onTap()
+private fun Modifier.scoreTaps(originX: Float, guard: TapGuard, onTap: () -> Unit): Modifier =
+    pointerInput(originX, guard) {
+        val slop = viewConfiguration.touchSlop
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = true)
+            var valid = guard.allows(originX + down.position.x, down.position.y)
+            while (true) {
+                val event = awaitPointerEvent()
+                if (event.changes.size > 1) valid = false
+                val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                if (change.isConsumed || (change.position - down.position).getDistance() > slop) valid = false
+                if (!change.pressed) {
+                    if (valid && change.uptimeMillis - down.uptimeMillis <= MAX_TAP_MS) {
+                        change.consume()
+                        onTap()
+                    }
+                    break
                 }
-                break
             }
         }
     }
+
+/** Records this control's window bounds, around which [guard] refuses score taps. */
+private fun Modifier.noScoreZone(guard: TapGuard, key: String): Modifier = onGloballyPositioned {
+    val origin = it.positionInRoot()
+    guard.setControl(key, origin.x, origin.y, origin.x + it.size.width, origin.y + it.size.height)
 }
 
 @Composable
@@ -353,10 +388,10 @@ private fun IconControl(
 }
 
 @Composable
-private fun TextControl(label: String, color: Color, onClick: () -> Unit) {
+private fun TextControl(label: String, color: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .size(TEXT_CONTROL_WIDTH, CONTROL)
             .clip(CONTROL_SHAPE)
             .border(1.5.dp, color, CONTROL_SHAPE)
@@ -366,28 +401,35 @@ private fun TextControl(label: String, color: Color, onClick: () -> Unit) {
     }
 }
 
-/** Reset needs a deliberate ~1 s hold; a short tap only explains that. */
+/**
+ * Reset needs a deliberate hold of [HOLD_TO_RESET_MS]; a short tap only explains that. While held,
+ * [progress] runs from 0 to 1, and the screen draws it as a fill rising from the bottom, which
+ * stays visible around the finger on the button.
+ */
 @Composable
-private fun HoldToResetControl(label: String, palette: Palette, onHeld: () -> Unit, onTooShort: () -> Unit) {
-    val progress = remember { Animatable(0f) }
+private fun HoldToResetControl(
+    label: String,
+    color: Color,
+    progress: Animatable<Float, AnimationVector1D>,
+    onHeld: () -> Unit,
+    onTooShort: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val scope = rememberCoroutineScope()
     val held by rememberUpdatedState(onHeld)
     val tooShort by rememberUpdatedState(onTooShort)
     val description = stringResource(R.string.cd_hold_reset)
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .size(TEXT_CONTROL_WIDTH, CONTROL)
             .clip(CONTROL_SHAPE)
-            .drawBehind {
-                drawRect(palette.warnFlash, size = Size(size.width * progress.value, size.height))
-            }
-            .border(1.5.dp, palette.control, CONTROL_SHAPE)
+            .border(1.5.dp, color, CONTROL_SHAPE)
             .semantics {
                 contentDescription = description
                 role = Role.Button
             }
-            .pointerInput(Unit) {
+            .pointerInput(progress) {
                 awaitEachGesture {
                     awaitFirstDown().consume()
                     val fill = scope.launch {
@@ -400,16 +442,18 @@ private fun HoldToResetControl(label: String, palette: Palette, onHeld: () -> Un
                     }
                     fill.cancel()
                     if (releasedEarly == null) {
+                        // The reset flash, in the same colour, takes over from the full screen.
+                        scope.launch { progress.snapTo(0f) }
                         held()
                         waitForUpOrCancellation()
                     } else {
                         tooShort()
+                        scope.launch { progress.animateTo(0f, tween(150)) }
                     }
-                    scope.launch { progress.animateTo(0f, tween(150)) }
                 }
             },
     ) {
-        ControlLabel(label, palette.control)
+        ControlLabel(label, color)
     }
 }
 

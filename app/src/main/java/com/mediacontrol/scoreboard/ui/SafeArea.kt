@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import com.mediacontrol.scoreboard.core.Box
+import com.mediacontrol.scoreboard.core.CornerRadii
 import com.mediacontrol.scoreboard.core.LayoutInsets
 import kotlin.math.max
 
@@ -25,8 +26,8 @@ data class SafeArea(
     val cutout: LayoutInsets,
     /** Exact bounding rectangles of the cutouts (API 28+), empty when unknown or none. */
     val cutoutRects: List<Box>,
-    /** Rounded display corner radii, indexed by [Corner.ordinal]. */
-    val cornerRadii: List<Float>,
+    /** Rounded display corners (API 31+), all 0 when unknown or square. */
+    val cornerRadii: CornerRadii,
 ) {
     /**
      * Distance from the two edges meeting at [corner] that keeps a control there fully visible:
@@ -34,7 +35,13 @@ data class SafeArea(
      * both edges lies within a corner arc of radius r when d >= r * (1 - 1/sqrt 2) ~= 0.293 r).
      */
     fun cornerInset(corner: Corner, margin: Float): Pair<Float, Float> {
-        val round = cornerRadii[corner.ordinal] * 0.3f
+        val radius = when (corner) {
+            Corner.TOP_LEFT -> cornerRadii.topLeft
+            Corner.TOP_RIGHT -> cornerRadii.topRight
+            Corner.BOTTOM_LEFT -> cornerRadii.bottomLeft
+            Corner.BOTTOM_RIGHT -> cornerRadii.bottomRight
+        }
+        val round = radius * 0.3f
         val horizontalBand = if (corner == Corner.TOP_LEFT || corner == Corner.BOTTOM_LEFT) cutout.left else cutout.right
         val verticalBand = if (corner == Corner.TOP_LEFT || corner == Corner.TOP_RIGHT) cutout.top else cutout.bottom
         return (max(horizontalBand, round) + margin) to (max(verticalBand, round) + margin)
@@ -59,7 +66,12 @@ fun rememberSafeArea(windowWidth: Int, windowHeight: Int): SafeArea {
         SafeArea(
             cutout = LayoutInsets(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat()),
             cutoutRects = cutoutRects(view),
-            cornerRadii = Corner.entries.map { cornerRadius(view, it) },
+            cornerRadii = CornerRadii(
+                topLeft = cornerRadius(view, Corner.TOP_LEFT),
+                topRight = cornerRadius(view, Corner.TOP_RIGHT),
+                bottomLeft = cornerRadius(view, Corner.BOTTOM_LEFT),
+                bottomRight = cornerRadius(view, Corner.BOTTOM_RIGHT),
+            ),
         )
     }
 }

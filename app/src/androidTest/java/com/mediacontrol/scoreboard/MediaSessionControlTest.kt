@@ -36,7 +36,7 @@ class MediaSessionControlTest {
     @Before
     fun connect() {
         instrumentation.runOnMainSync {
-            app.settings.update { it.copy(volumeReset = true) }
+            app.settings.update { it.copy(volumeReset = true, highlightServer = true) }
             app.controller.reset(InputSource.TOUCH)
         }
         val token = waitFor("session token") { app.sessionToken.value }
@@ -50,11 +50,11 @@ class MediaSessionControlTest {
         transport.skipToNext()
         transport.skipToNext()
         transport.skipToPrevious()
-        awaitTitle("1 : 2")
+        awaitTitle("●1 : 2")
         transport.pause()
-        awaitTitle("0 : 2")
+        awaitTitle("0 : 2●")
         transport.play()
-        awaitTitle("0 : 1")
+        awaitTitle("0 : 1●")
         assertEquals(PlaybackState.STATE_PLAYING, controller.playbackState?.state)
         assertEquals(app.getString(R.string.status_undo), metadata(MediaMetadata.METADATA_KEY_ARTIST))
     }
@@ -63,7 +63,7 @@ class MediaSessionControlTest {
     fun mediaButtonCountsOncePerPressAndPlayPauseUndoesImmediately() {
         press(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
         press(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
-        awaitTitle("2 : 0")
+        awaitTitle("●2 : 0")
         // Two quick play/pause presses are two undos, not the framework's "double tap = next".
         press(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
         press(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
@@ -73,9 +73,18 @@ class MediaSessionControlTest {
     @Test
     fun podcastStyleSeeksAddPointsByDirection() {
         controller.transportControls.seekTo(currentPosition() + 15_000)
-        awaitTitle("0 : 1")
+        awaitTitle("0 : 1●")
         controller.transportControls.seekTo(currentPosition() - 10_000)
-        awaitTitle("1 : 1")
+        awaitTitle("●1 : 1")
+    }
+
+    /** The watch title marks the side that serves; the highlight setting turns the mark off too. */
+    @Test
+    fun theServeMarkFollowsTheHighlightSetting() {
+        controller.transportControls.skipToPrevious()
+        awaitTitle("●1 : 0")
+        instrumentation.runOnMainSync { app.settings.update { it.copy(highlightServer = false) } }
+        awaitTitle("1 : 0")
     }
 
     @Test
@@ -84,12 +93,12 @@ class MediaSessionControlTest {
         val phoneVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
         controller.transportControls.skipToNext()
         controller.transportControls.skipToPrevious()
-        awaitTitle("1 : 1")
+        awaitTitle("●1 : 1")
 
         controller.adjustVolume(AudioManager.ADJUST_RAISE, 0)
         val armed = app.getString(R.string.status_reset_armed)
         waitFor("reset armed") { armed.takeIf { it == metadata(MediaMetadata.METADATA_KEY_ARTIST) } }
-        assertEquals("1 : 1", metadata(MediaMetadata.METADATA_KEY_TITLE))
+        assertEquals("●1 : 1", metadata(MediaMetadata.METADATA_KEY_TITLE))
         SystemClock.sleep(900)
         controller.setVolumeTo(8, 0)
         awaitTitle("0 : 0")
@@ -105,7 +114,7 @@ class MediaSessionControlTest {
         val before = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
         val up = before < audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         controller.transportControls.skipToNext()
-        awaitTitle("0 : 1")
+        awaitTitle("0 : 1●")
         activity.scenario.moveToState(Lifecycle.State.CREATED) // stopped: another app or screen off
         try {
             repeat(2) {
@@ -116,7 +125,7 @@ class MediaSessionControlTest {
                 true.takeIf { audio.getStreamVolume(AudioManager.STREAM_MUSIC) != before }
             }
             assertNull(app.controller.resetArmedUntil.value)
-            assertEquals("0 : 1", metadata(MediaMetadata.METADATA_KEY_TITLE))
+            assertEquals("0 : 1●", metadata(MediaMetadata.METADATA_KEY_TITLE))
         } finally {
             audio.setStreamVolume(AudioManager.STREAM_MUSIC, before, 0)
         }
@@ -130,7 +139,7 @@ class MediaSessionControlTest {
         val baseline = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
         val other = if (baseline < audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)) baseline + 1 else baseline - 1
         controller.transportControls.skipToPrevious()
-        awaitTitle("1 : 0")
+        awaitTitle("●1 : 0")
 
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, other, 0)
         val armed = app.getString(R.string.status_reset_armed)

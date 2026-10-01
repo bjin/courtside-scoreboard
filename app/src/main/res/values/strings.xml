@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Scoreboard</string>
 
-    <!-- MediaSession metadata: the watch shows the title as the "track" name. -->
-    <string name="score_title">%1$d : %2$d</string>
+    <!-- MediaSession metadata: the title is the score (core/WatchTitle.kt); the watch shows this
+         status line as the "artist" below it. -->
     <string name="status_idle">Scoreboard</string>
     <string name="status_point_left">Left +1</string>
     <string name="status_point_right">Right +1</string>
@@ -31,14 +31,14 @@
     <string name="msg_swapped">Sides swapped</string>
     <string name="msg_nothing_to_undo">Nothing to undo</string>
     <string name="msg_max_score">99 is the maximum</string>
-    <string name="hint_hold_reset">Hold RESET for a second to clear the score</string>
+    <string name="hint_hold_reset">Hold RESET until the screen fills up</string>
     <string name="hint_back_again">Back again to leave the scoreboard</string>
     <string name="cd_left_score">Left score %1$d. Tap to add a point.</string>
     <string name="cd_right_score">Right score %1$d. Tap to add a point.</string>
     <string name="cd_serving">Won the last point, serves next</string>
     <string name="cd_toggle_theme">Switch between light and dark background</string>
     <string name="cd_menu">Menu</string>
-    <string name="cd_hold_reset">Reset to 0 : 0, hold for one second</string>
+    <string name="cd_hold_reset">Reset to 0 : 0, press and hold</string>
 
     <!-- Menu -->
     <string name="menu_title">Scoreboard</string>

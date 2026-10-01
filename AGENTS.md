@@ -20,10 +20,10 @@ player and shows the score as the track title.
 ## Hard constraints
 - Only `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK`; no network, accounts,
   analytics or ads. Never leave the phone's real media volume changed.
-- A score tap is one finger, no drag beyond touch slop, at most 0.8 s. Taps on controls or
-  messages never count.
+- A score tap is one finger, no drag beyond touch slop, at most 0.8 s. It never starts on a
+  message, in a control's 1.5× zone, or within 24 dp of the rounded display edge (`TapGuard`).
 - Reset returns to 0 : 0, clears the undo history, and always needs a deliberate second action.
-- Session metadata (title `L : R`) is updated right after every change and at startup.
+- Metadata title `L : R` (`●` beside the serving side) is updated after every change and at startup.
 
 ## Key design choices
 - `core/` is pure Kotlin (only compile-time `KeyEvent` constants), unit-tested on the JVM:
@@ -59,8 +59,8 @@ player and shows the score as the track title.
   - Layout avoids cutout rects that reach the digit rows, and rounded corners. LTR is forced
     (left/right are physical sides); the window is immersive and edge-to-edge.
 - UX: the side that won the last point is tinted (in badminton the rally winner serves); changes
-  flash the affected side; RESET needs a hold; leaving needs two back presses; foreground volume
-  keys are reset presses, handled in `onKeyDown`/`onKeyUp`.
+  flash the affected side; holding RESET fills the screen from the bottom; leaving needs two back
+  presses; foreground volume keys are reset presses, handled in `onKeyDown`/`onKeyUp`.
 
 ## Build and test
 Requires JDK 17+ and an Android SDK (`ANDROID_HOME` or `local.properties`). Versions live in
@@ -77,7 +77,7 @@ Instrumented tests reach the session through `ScoreboardApp.sessionToken` + `Med
 ## Emulator instrumentation
 ```sh
 adb shell settings put system accelerometer_rotation 0; adb shell settings put system user_rotation 1
-adb shell wm size 1200x2608; adb shell wm density 440   # target; 1080x1920 = 16:9; wm size reset
+adb shell wm size 1200x2608; adb shell wm density 480   # target; 1080x1920 = 16:9; wm size reset
 adb shell cmd overlay enable-exclusive --category com.android.internal.display.cutout.emulation.tall
 adb shell cmd media_session dispatch next              # previous | play-pause
 adb shell dumpsys media_session    # state=PLAYING, volumeType=REMOTE, description=<L : R>, <status>
