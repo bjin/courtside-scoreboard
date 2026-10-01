@@ -82,19 +82,30 @@ object ScoreLayout {
     const val MAX_DIGITS = 2
 
     /**
+     * Clear space between the two scores, as a fraction of the window width. About twice the gap
+     * between the two digits of one score, so "21 19" reads as two numbers, not "2119", from afar.
+     */
+    const val CENTER_GAP_FRACTION = 0.08f
+    const val EDGE_MARGIN_FRACTION = 0.02f
+    const val CUTOUT_CLEARANCE_FRACTION = 0.005f
+
+    /**
      * Splits the usable width into two equal halves and sizes the digits so a two-digit score
      * fills them. Single digits use the same scale, so nothing jumps at 10.
      *
-     * A display cutout on one edge (punch-hole camera in landscape) replaces that edge's margin
-     * instead of adding to it, and the divider moves to the middle of the remaining width, so the
-     * cutout costs both scores as little size as possible while both stay the same size.
+     * A display cutout (punch-hole camera, which sits on a short edge in landscape) only matters
+     * if it reaches into the rows the digits occupy; then it replaces that edge's margin instead of
+     * adding to it. The divider moves to the middle of the remaining width, so a cutout costs both
+     * scores as little size as possible while both stay the same size.
      *
-     * @param safe areas to avoid on each edge (display cutout bands), in px.
+     * @param safe cutout bands on each edge, in px. The side bands are used only when [cutouts]
+     *   (exact bounding rectangles) are unknown.
+     * @param cutouts bounding rectangles of the display cutouts in window px.
      * @param topBand height reserved for the top controls row, measured from the window edge.
      * @param bottomBand height reserved for the bottom controls row, measured from the window edge.
      * @param centerGap clear space between the two scores (contains the divider), in px.
      * @param edgeMargin clear space between the scores and a side edge without cutout, in px.
-     * @param cutoutClearance extra space kept between the scores and a cutout band, in px.
+     * @param cutoutClearance extra space kept between the scores and a cutout, in px.
      */
     fun compute(
         width: Float,
@@ -103,15 +114,26 @@ object ScoreLayout {
         safe: LayoutInsets,
         topBand: Float,
         bottomBand: Float,
-        centerGap: Float,
-        edgeMargin: Float,
-        cutoutClearance: Float,
+        cutouts: List<Box> = emptyList(),
+        centerGap: Float = width * CENTER_GAP_FRACTION,
+        edgeMargin: Float = width * EDGE_MARGIN_FRACTION,
+        cutoutClearance: Float = width * CUTOUT_CLEARANCE_FRACTION,
     ): ScoreboardGeometry {
-        val left = max(if (safe.left > 0f) safe.left + cutoutClearance else 0f, edgeMargin)
-        val right = width - max(if (safe.right > 0f) safe.right + cutoutClearance else 0f, edgeMargin)
-        val dividerX = (left + right) / 2f
         val top = max(safe.top, topBand)
         val bottom = height - max(safe.bottom, bottomBand)
+        var cutLeft = if (cutouts.isEmpty()) safe.left else 0f
+        var cutRight = if (cutouts.isEmpty()) safe.right else 0f
+        for (cutout in cutouts) {
+            if (cutout.bottom <= top || cutout.top >= bottom) continue // beside the control rows only
+            if (cutout.centerX < width / 2f) {
+                cutLeft = max(cutLeft, cutout.right)
+            } else {
+                cutRight = max(cutRight, width - cutout.left)
+            }
+        }
+        val left = max(if (cutLeft > 0f) cutLeft + cutoutClearance else 0f, edgeMargin)
+        val right = width - max(if (cutRight > 0f) cutRight + cutoutClearance else 0f, edgeMargin)
+        val dividerX = (left + right) / 2f
         val leftBox = Box(left, top, dividerX - centerGap / 2f, bottom)
         val rightBox = Box(dividerX + centerGap / 2f, top, right, bottom)
         val scale = max(0f, min(fitScale(metrics, leftBox), fitScale(metrics, rightBox)))

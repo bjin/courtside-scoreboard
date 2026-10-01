@@ -1,10 +1,10 @@
 package com.mediacontrol.scoreboard.ui
 
 import android.graphics.drawable.ColorDrawable
-import android.media.session.MediaController
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.mediacontrol.scoreboard.R
 import com.mediacontrol.scoreboard.core.InputSource
+import com.mediacontrol.scoreboard.core.RemoteInput
 import com.mediacontrol.scoreboard.data.Settings
 import com.mediacontrol.scoreboard.media.ScoreboardService
 import com.mediacontrol.scoreboard.scoreboardApp
@@ -98,12 +99,22 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch { settingsStore.settings.collect(::applyWindowSettings) }
-        // Hardware volume keys go to the session while the scoreboard is in front.
-        lifecycleScope.launch {
-            app.sessionToken.collect { token ->
-                mediaController = token?.let { MediaController(this@MainActivity, it) }
-            }
+    }
+
+    /**
+     * With the scoreboard in front, the phone's volume keys are reset presses (same two-step rule as
+     * the watch). Handling them here keeps the system volume panel from covering the score and
+     * swallows key auto-repeat, so holding a key is one press. When volume reset is off, the keys
+     * adjust the phone volume as usual.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val volumeKey = event.keyCode == KeyEvent.KEYCODE_VOLUME_UP || event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+        if (!volumeKey || !scoreboardApp.settings.settings.value.volumeReset) return super.dispatchKeyEvent(event)
+        if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+            val key = KeyEvent.keyCodeToString(event.keyCode).removePrefix("KEYCODE_")
+            scoreboardApp.controller.onRemoteVolume(RemoteInput("phone key $key", caller = null))
         }
+        return true
     }
 
     override fun onStart() {

@@ -42,11 +42,13 @@ internal class SilentPulse(private val handler: Handler) {
             Log.w(TAG, "No audio output for the media-button claim", e)
             return
         }
+        // A static track reports STATE_NO_STATIC_DATA until its buffer is written.
+        newTrack.write(ShortArray(frames), 0, frames)
         if (newTrack.state != AudioTrack.STATE_INITIALIZED) {
+            Log.w(TAG, "Media-button claim clip could not be prepared (state ${newTrack.state})")
             newTrack.release()
             return
         }
-        newTrack.write(ShortArray(frames), 0, frames)
         try {
             newTrack.play()
         } catch (e: IllegalStateException) {

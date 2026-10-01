@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import com.mediacontrol.scoreboard.core.Box
 import com.mediacontrol.scoreboard.core.LayoutInsets
 import kotlin.math.max
 
@@ -22,6 +23,8 @@ enum class Corner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 data class SafeArea(
     /** Display cutout bands (punch-hole camera, notch) on each edge. */
     val cutout: LayoutInsets,
+    /** Exact bounding rectangles of the cutouts (API 28+), empty when unknown or none. */
+    val cutoutRects: List<Box>,
     /** Rounded display corner radii, indexed by [Corner.ordinal]. */
     val cornerRadii: List<Float>,
 ) {
@@ -39,8 +42,8 @@ data class SafeArea(
 }
 
 /**
- * Cutout insets come from Compose (they update on rotation); rounded corners are read from the
- * root window insets (API 31+) whenever the window size or the cutout changes.
+ * Cutout insets come from Compose (they update on rotation); cutout rectangles and rounded corners
+ * are read from the root window insets whenever the window size or the cutout changes.
  */
 @Composable
 fun rememberSafeArea(windowWidth: Int, windowHeight: Int): SafeArea {
@@ -55,8 +58,17 @@ fun rememberSafeArea(windowWidth: Int, windowHeight: Int): SafeArea {
     return remember(windowWidth, windowHeight, left, top, right, bottom, view) {
         SafeArea(
             cutout = LayoutInsets(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat()),
+            cutoutRects = cutoutRects(view),
             cornerRadii = Corner.entries.map { cornerRadius(view, it) },
         )
+    }
+}
+
+private fun cutoutRects(view: View): List<Box> {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return emptyList()
+    val rects = view.rootWindowInsets?.displayCutout?.boundingRects ?: return emptyList()
+    return rects.filterNot { it.isEmpty }.map {
+        Box(it.left.toFloat(), it.top.toFloat(), it.right.toFloat(), it.bottom.toFloat())
     }
 }
 

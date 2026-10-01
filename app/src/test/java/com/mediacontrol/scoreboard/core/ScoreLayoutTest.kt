@@ -38,9 +38,6 @@ class ScoreLayoutTest {
             safe = LayoutInsets(left = s.cutoutLeft),
             topBand = band,
             bottomBand = band,
-            centerGap = s.width * 0.06f,
-            edgeMargin = s.width * 0.02f,
-            cutoutClearance = s.width * 0.005f,
         )
     }
 
@@ -93,9 +90,31 @@ class ScoreLayoutTest {
         val target = screens.first()
         val withCutout = layout(target).inkBounds(Side.LEFT, 2).height
         val withoutCutout = layout(target.copy(cutoutLeft = 0f)).inkBounds(Side.LEFT, 2).height
-        // 2608x1200 at ~0.059 mm/px: 700 px is ~41 mm tall digits.
-        assertTrue("digit height $withCutout px", withCutout >= 700f)
+        // 2608x1200 at ~0.059 mm/px: 690 px is ~41 mm tall digits.
+        assertTrue("digit height $withCutout px", withCutout >= 690f)
         assertTrue(withCutout >= 0.95f * withoutCutout)
+    }
+
+    @Test
+    fun aPunchHoleBesideTheDigitsIsAvoidedButOneInACornerCostsNothing() {
+        val width = 2608f
+        val height = 1200f
+        val band = 165f
+        fun withHole(hole: Box) = ScoreLayout.compute(
+            width, height, b612, LayoutInsets(left = hole.right), band, band, cutouts = listOf(hole),
+        )
+        val plain = ScoreLayout.compute(width, height, b612, LayoutInsets(), band, band)
+
+        // Centred punch hole of a portrait-top camera, on the left edge in landscape.
+        val centred = Box(30f, 560f, 110f, 640f)
+        val g = withHole(centred)
+        assertFalse(g.inkBounds(Side.LEFT, 2).intersects(centred))
+        assertTrue(g.scale < plain.scale)
+        assertEquals(g.inkBounds(Side.LEFT, 2).height, g.inkBounds(Side.RIGHT, 2).height, 0.001f)
+
+        // Hole in a corner, beside the control rows only (the emulator's "hole" cutout).
+        val corner = Box(0f, 1052f, 148f, 1200f)
+        assertEquals(plain.scale, withHole(corner).scale, 0.0001f)
     }
 
     private fun Box.inset(by: Float) = Box(left + by, top + by, right - by, bottom - by)

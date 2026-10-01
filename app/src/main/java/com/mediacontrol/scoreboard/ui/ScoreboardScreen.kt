@@ -107,11 +107,8 @@ private val TEXT_CONTROL_WIDTH = 92.dp
 private val EDGE = 8.dp
 private val CONTROL_SHAPE = RoundedCornerShape(12.dp)
 
-/** Clear space between the two scores (holds the divider), as a fraction of the window width. */
-private const val CENTER_GAP_FRACTION = 0.06f
-private const val EDGE_MARGIN_FRACTION = 0.02f
-private const val CUTOUT_CLEARANCE_FRACTION = 0.005f
-private const val DIVIDER_FRACTION = 0.008f
+/** Divider bar width, as a fraction of the window width (it sits in the gap between the scores). */
+private const val DIVIDER_FRACTION = 0.012f
 private const val FLASH_MS = 900
 private const val MESSAGE_MS = 2_000L
 
@@ -157,9 +154,7 @@ fun ScoreboardScreen(ui: ScoreboardUi, glyphs: DigitGlyphs, actions: ScoreboardA
                 safe = safe.cutout,
                 topBand = band,
                 bottomBand = band,
-                centerGap = width * CENTER_GAP_FRACTION,
-                edgeMargin = width * EDGE_MARGIN_FRACTION,
-                cutoutClearance = width * CUTOUT_CLEARANCE_FRACTION,
+                cutouts = safe.cutoutRects,
             )
         }
 
