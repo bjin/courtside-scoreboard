@@ -1,6 +1,5 @@
 package com.mediacontrol.scoreboard.ui
 
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -17,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -103,19 +103,25 @@ class MainActivity : ComponentActivity() {
 
     /**
      * With the scoreboard in front, the phone's volume keys are reset presses (same two-step rule as
-     * the watch). Handling them here keeps the system volume panel from covering the score and
-     * swallows key auto-repeat, so holding a key is one press. When volume reset is off, the keys
+     * the watch). Consuming them here keeps the system volume panel from covering the score and
+     * ignores key auto-repeat, so holding a key is one press. When volume reset is off, the keys
      * adjust the phone volume as usual.
      */
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val volumeKey = event.keyCode == KeyEvent.KEYCODE_VOLUME_UP || event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-        if (!volumeKey || !scoreboardApp.settings.settings.value.volumeReset) return super.dispatchKeyEvent(event)
-        if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
-            val key = KeyEvent.keyCodeToString(event.keyCode).removePrefix("KEYCODE_")
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (!isScoreboardVolumeKey(keyCode)) return super.onKeyDown(keyCode, event)
+        if (event.repeatCount == 0) {
+            val key = KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
             scoreboardApp.controller.onRemoteVolume(RemoteInput("phone key $key", caller = null))
         }
         return true
     }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean =
+        isScoreboardVolumeKey(keyCode) || super.onKeyUp(keyCode, event)
+
+    private fun isScoreboardVolumeKey(keyCode: Int): Boolean =
+        (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) &&
+            scoreboardApp.settings.settings.value.volumeReset
 
     override fun onStart() {
         super.onStart()
@@ -167,7 +173,7 @@ class MainActivity : ComponentActivity() {
             SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT)
         }
         enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-        window.setBackgroundDrawable(ColorDrawable(background))
+        window.setBackgroundDrawable(background.toDrawable())
         if (settings.keepScreenOn) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {

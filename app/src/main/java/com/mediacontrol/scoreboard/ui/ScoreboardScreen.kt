@@ -423,6 +423,7 @@ private fun ControlLabel(label: String, color: Color) {
     )
 }
 
+/** One-line status. Touching it does nothing (it never counts as a tap on the half below it). */
 @Composable
 private fun StatusPill(text: String, alert: Boolean, palette: Palette, modifier: Modifier = Modifier) {
     Text(
@@ -432,6 +433,15 @@ private fun StatusPill(text: String, alert: Boolean, palette: Palette, modifier:
         fontWeight = FontWeight.Bold,
         maxLines = 1,
         modifier = modifier
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown().consume()
+                    do {
+                        val event = awaitPointerEvent()
+                        event.changes.forEach { it.consume() }
+                    } while (event.changes.any { it.pressed })
+                }
+            }
             .background(if (alert) palette.alertPill else palette.pill, RoundedCornerShape(50))
             .padding(horizontal = 18.dp, vertical = 8.dp),
     )

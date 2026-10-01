@@ -1,5 +1,6 @@
 package com.mediacontrol.scoreboard.media
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -217,6 +218,8 @@ class ScoreboardService : Service() {
         },
     )
 
+    // The type constant is inlined; ServiceCompat ignores it below API 29.
+    @SuppressLint("InlinedApi")
     private fun goForeground() {
         try {
             ServiceCompat.startForeground(
@@ -244,6 +247,9 @@ class ScoreboardService : Service() {
         handler.postDelayed(notifyRunnable, wait.coerceAtLeast(0))
     }
 
+    // Media-session notifications are exempt from the POST_NOTIFICATIONS runtime permission, so the
+    // app needs (and requests) no notification permission.
+    @SuppressLint("NotificationPermission")
     private fun postNotification() {
         lastNotificationAt = SystemClock.uptimeMillis()
         getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, buildNotification())
