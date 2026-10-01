@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.mediacontrol.scoreboard"
+    namespace = "io.github.bjin.courtside"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.mediacontrol.scoreboard"
+        applicationId = "io.github.bjin.courtside"
         minSdk = 26
         // The target phone runs Android 16 (API 36); keep its behaviour on newer emulators too.
         targetSdk = 36

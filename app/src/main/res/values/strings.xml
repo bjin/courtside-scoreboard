@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Scoreboard</string>
+    <string name="app_name">Courtside</string>
 
     <!-- MediaSession metadata: the title is the score (core/WatchTitle.kt); the watch shows this
          status line as the "artist" below it. -->
-    <string name="status_idle">Scoreboard</string>
+    <string name="status_idle">Courtside</string>
     <string name="status_point_left">Left +1</string>
     <string name="status_point_right">Right +1</string>
     <string name="status_undo">Undo</string>
@@ -16,7 +16,7 @@
     <string name="status_max">Max 99</string>
 
     <string name="channel_name">Scoreboard</string>
-    <string name="notification_text">Scoreboard running · watch control active</string>
+    <string name="notification_text">Courtside running · watch control active</string>
 
     <!-- Scoreboard screen -->
     <string name="action_swap">SWAP</string>
@@ -41,7 +41,7 @@
     <string name="cd_hold_reset">Reset to 0 : 0, press and hold</string>
 
     <!-- Menu -->
-    <string name="menu_title">Scoreboard</string>
+    <string name="menu_title">Courtside</string>
     <string name="menu_swap">Swap sides</string>
     <string name="menu_exit">Exit</string>
     <string name="menu_close">Close</string>

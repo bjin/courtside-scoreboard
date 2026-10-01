@@ -1,4 +1,4 @@
-# Media Control Scoreboard
+# Courtside
 
 A fullscreen landscape badminton scoreboard for an Android phone placed beside the court.
 Two huge scores are readable from about 6 m away, and the score can be kept with a
@@ -72,20 +72,20 @@ recreation and process restarts. Scores stop at 99.
    needs this for Media Control. Keep the COROS app running in the background.
    On Xiaomi/HyperOS, set the COROS app to *Battery saver: No restrictions* and allow
    *Autostart*.
-2. On HyperOS, also set **Scoreboard** to *Battery saver: No restrictions*. Without it HyperOS
+2. On HyperOS, also set **Courtside** to *Battery saver: No restrictions*. Without it HyperOS
    freezes the app as soon as it is not on screen (screen off, another app in front), even with its
    media service running, and watch buttons are only applied when you come back. Don't clear
-   Scoreboard from the recent apps during a match: HyperOS force-stops it. If you want *Show over
+   Courtside from the recent apps during a match: HyperOS force-stops it. If you want *Show over
    the lock screen*, also allow *Show on Lock screen* in the app's *Other permissions*.
-3. Open Scoreboard. A "Scoreboard" media notification appears and the session reports
+3. Open Courtside. A "Courtside" media notification appears and the session reports
    "playing". On the watch, open Media Control: Toolbox (long-press Back) → Media Control, or
    use the *Switch View* shortcut during an activity. It shows **○ 0 : 0 ○** as the title.
 4. Don't play music on the same phone during the match. The watch controls the active media
-   session, so another player could take over. Bringing Scoreboard to the front re-claims it.
+   session, so another player could take over. Bringing Courtside to the front re-claims it.
 
 ### Watch control mapping
 
-| COROS Media Control | Scoreboard |
+| COROS Media Control | Courtside |
 |---|---|
 | ⏮ Previous | **Left +1** |
 | ⏭ Next | **Right +1** |

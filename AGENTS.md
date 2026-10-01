@@ -1,10 +1,10 @@
 # AGENTS.md
 
 ## Purpose
-Android app that turns a phone into a courtside badminton scoreboard: fullscreen landscape, two
-huge scores readable from about 6 m. A COROS APEX 4 watch controls it through its built-in Media
-Control ("手机音频"): the app exposes a MediaSession, so the watch treats it as the active media
-player and shows the score as the track title.
+Courtside (`io.github.bjin.courtside`) turns an Android phone into a badminton scoreboard beside
+the court: fullscreen landscape, two huge scores readable from about 6 m. A COROS APEX 4 watch
+controls it through its built-in Media Control ("手机音频"): the app exposes a MediaSession, so the
+watch treats it as the active media player and shows the score as the track title.
 
 ## Target system
 - Phone: 2608×1200 display in landscape, small rounded corners, Android 16 (Xiaomi HyperOS).
