@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -109,7 +111,7 @@ class ScoreboardActions(
 /** Height reserved above and below the digits for controls and messages. */
 private val BAND = 60.dp
 private val CONTROL = 44.dp
-private val TEXT_CONTROL_WIDTH = 92.dp
+private val TEXT_CONTROL_MIN_WIDTH = 92.dp
 private val EDGE = 8.dp
 private val CONTROL_SHAPE = RoundedCornerShape(12.dp)
 
@@ -392,10 +394,12 @@ private fun TextControl(label: String, color: Color, onClick: () -> Unit, modifi
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(TEXT_CONTROL_WIDTH, CONTROL)
+            .widthIn(min = TEXT_CONTROL_MIN_WIDTH)
+            .height(CONTROL)
             .clip(CONTROL_SHAPE)
             .border(1.5.dp, color, CONTROL_SHAPE)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp),
     ) {
         ControlLabel(label, color)
     }
@@ -422,7 +426,8 @@ private fun HoldToResetControl(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(TEXT_CONTROL_WIDTH, CONTROL)
+            .widthIn(min = TEXT_CONTROL_MIN_WIDTH)
+            .height(CONTROL)
             .clip(CONTROL_SHAPE)
             .border(1.5.dp, color, CONTROL_SHAPE)
             .semantics {
@@ -451,7 +456,8 @@ private fun HoldToResetControl(
                         scope.launch { progress.animateTo(0f, tween(150)) }
                     }
                 }
-            },
+            }
+            .padding(horizontal = 12.dp),
     ) {
         ControlLabel(label, color)
     }
@@ -464,7 +470,7 @@ private fun ControlLabel(label: String, color: Color) {
         color = color,
         fontSize = 15.sp,
         fontWeight = FontWeight.Bold,
-        letterSpacing = 1.sp,
+        letterSpacing = 0.sp,
         maxLines = 1,
     )
 }

@@ -9,3 +9,9 @@
 /captures/
 .externalNativeBuild/
 .cxx/
+
+# UI text uses system fonts; never stage additional font binaries (including CJK).
+*.otf
+*.ttc
+*.ttf
+!/app/src/main/res/font/score_digits.ttf

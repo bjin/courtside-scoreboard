@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Courtside</string>
+    <string name="status_idle">Courtside</string>
+    <string name="status_point_left">Izquierda +1</string>
+    <string name="status_point_right">Derecha +1</string>
+    <string name="status_undo">Deshacer</string>
+    <string name="status_reset">Marcador restablecido a 0 : 0</string>
+    <string name="status_swap">Lados intercambiados</string>
+    <string name="status_reset_armed">Volumen otra vez = REINICIAR</string>
+    <string name="status_reset_cancelled">Restablecimiento cancelado</string>
+    <string name="status_nothing_to_undo">Nada que deshacer</string>
+    <string name="status_max">Máx. 99</string>
+    <string name="channel_name">Marcador</string>
+    <string name="notification_text">Courtside en ejecución · control desde el reloj activo</string>
+    <string name="action_swap">CAMBIAR</string>
+    <string name="action_undo">DESHACER</string>
+    <string name="action_reset">REINICIAR</string>
+    <string name="status_reset_armed_screen">¿REINICIAR? Pulsa volumen otra vez (%1$d)</string>
+    <string name="msg_remote_point_left">Control remoto: izquierda +1</string>
+    <string name="msg_remote_point_right">Control remoto: derecha +1</string>
+    <string name="msg_remote_undo">Control remoto: deshacer</string>
+    <string name="msg_remote_reset">Control remoto: marcador restablecido a 0 : 0</string>
+    <string name="msg_reset">Marcador restablecido a 0 : 0</string>
+    <string name="msg_swapped">Lados intercambiados</string>
+    <string name="msg_nothing_to_undo">Nada que deshacer</string>
+    <string name="msg_max_score">99 es el máximo</string>
+    <string name="hint_hold_reset">Mantén pulsado REINICIAR hasta que se llene la pantalla</string>
+    <string name="hint_back_again">Pulsa Atrás otra vez para salir del marcador</string>
+    <string name="cd_left_score">Puntuación izquierda: %1$d. Toca para añadir un punto.</string>
+    <string name="cd_right_score">Puntuación derecha: %1$d. Toca para añadir un punto.</string>
+    <string name="cd_serving">Ganó el último punto y tiene el siguiente saque</string>
+    <string name="cd_toggle_theme">Cambiar entre fondo claro y oscuro</string>
+    <string name="cd_menu">Menú</string>
+    <string name="cd_hold_reset">Restablecer a 0 : 0, mantener pulsado</string>
+    <string name="menu_title">Courtside</string>
+    <string name="menu_swap">Cambiar</string>
+    <string name="menu_exit">Salir</string>
+    <string name="menu_close">Cerrar</string>
+    <string name="menu_section_display">Pantalla</string>
+    <string name="menu_section_watch">Reloj / control multimedia</string>
+    <string name="menu_section_log">Comandos remotos recientes</string>
+    <string name="menu_section_about">Acerca de</string>
+    <string name="menu_language">Idioma</string>
+    <string name="language_system">Idioma del sistema</string>
+    <string name="setting_keep_screen_on">Mantener la pantalla encendida</string>
+    <string name="setting_max_brightness">Brillo máximo</string>
+    <string name="setting_highlight_server">Resaltar el lado que ganó el último punto (le toca sacar)</string>
+    <string name="setting_lock_screen">Mostrar sobre la pantalla de bloqueo</string>
+    <string name="setting_lock_screen_note">Xiaomi / HyperOS: permite también \"Mostrar en la pantalla de bloqueo\" en los otros permisos de la aplicación.</string>
+    <string name="setting_haptics">Vibrar al tocar</string>
+    <string name="setting_dark">Fondo oscuro</string>
+    <string name="watch_mapping">COROS Media Control (o cualquier control remoto multimedia):\nAnterior = izquierda +1\nSiguiente = derecha +1\nReproducir / Pausa = DESHACER\nVolumen dos veces (con una pausa entre ambas, en menos de 5 s) = REINICIAR a 0 : 0</string>
+    <string name="setting_volume_reset">El volumen del reloj restablece el marcador</string>
+    <string name="setting_volume_reset_note">Los comandos de volumen enviados al marcador nunca cambian el volumen del teléfono. Desactiva esta opción para volver a controlar el volumen del teléfono.</string>
+    <string name="setting_phone_volume">Usar también los cambios de volumen multimedia del teléfono</string>
+    <string name="setting_phone_volume_note">Para aplicaciones de reloj que cambian directamente el volumen del teléfono: cada cambio cuenta como una pulsación de volumen y el volumen anterior se restaura de inmediato.</string>
+    <string name="setting_claim_keys">Recibir botones multimedia</string>
+    <string name="setting_claim_keys_note">Reproduce 0,3 s de silencio al abrir el marcador para recibir aquí las pulsaciones de los botones multimedia de auriculares y dispositivos Bluetooth.</string>
+    <string name="log_empty">Aún no se ha recibido nada.</string>
+    <string name="log_ignored">ignorado</string>
+    <string name="about_privacy">Sin acceso a la red, cuentas, anuncios ni análisis de uso.</string>
+</resources>

@@ -9,6 +9,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.content.res.Configuration
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaMetadata
@@ -28,6 +29,7 @@ import io.github.bjin.courtside.core.Feedback
 import io.github.bjin.courtside.core.RemoteInput
 import io.github.bjin.courtside.core.Side
 import io.github.bjin.courtside.core.watchTitle
+import io.github.bjin.courtside.data.LanguageStore
 import io.github.bjin.courtside.scoreboardApp
 import io.github.bjin.courtside.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -54,6 +56,7 @@ class ScoreboardService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val app get() = scoreboardApp
+    private var textContext: Context = this
     private lateinit var session: MediaSession
     private lateinit var phoneVolume: PhoneVolumeWatcher
     private lateinit var silentPulse: SilentPulse
@@ -83,6 +86,7 @@ class ScoreboardService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        textContext = LanguageStore.localizedContext(this)
         session = MediaSession(this, TAG).apply {
             setCallback(
                 SessionCallback(
@@ -123,6 +127,11 @@ class ScoreboardService : Service() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         // The scoreboard was swiped away from recents: the match is over.
         stopSelf()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        refreshLanguage()
     }
 
     override fun onDestroy() {
@@ -166,6 +175,17 @@ class ScoreboardService : Service() {
                 phoneVolume.restoring = it
             }
         }
+        scope.launch {
+            app.languages.language.collect { refreshLanguage() }
+        }
+    }
+
+    private fun refreshLanguage() {
+        textContext = LanguageStore.localizedContext(this)
+        publishMetadata(
+            Published(currentTitle(), app.controller.feedback.value, app.controller.resetArmedUntil.value != null),
+        )
+        scheduleNotification()
     }
 
     /**
@@ -200,7 +220,7 @@ class ScoreboardService : Service() {
                 .putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, published.title)
                 .putString(MediaMetadata.METADATA_KEY_ARTIST, status)
                 .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, status)
-                .putString(MediaMetadata.METADATA_KEY_ALBUM, getString(R.string.app_name))
+                .putString(MediaMetadata.METADATA_KEY_ALBUM, textContext.getString(R.string.app_name))
                 .build(),
         )
     }
@@ -227,7 +247,7 @@ class ScoreboardService : Service() {
 
     private fun currentTitle() = watchTitle(app.controller.state.value, app.settings.settings.value.highlightServer)
 
-    private fun statusLine(feedback: Feedback?, armed: Boolean): String = getString(
+    private fun statusLine(feedback: Feedback?, armed: Boolean): String = textContext.getString(
         when {
             armed -> R.string.status_reset_armed
             feedback == null -> R.string.status_idle
@@ -282,9 +302,10 @@ class ScoreboardService : Service() {
 
     private fun buildNotification(): Notification {
         val manager = getSystemService(NotificationManager::class.java)
-        if (manager.getNotificationChannel(CHANNEL_ID) == null) {
+        val channelName = textContext.getString(R.string.channel_name)
+        if (manager.getNotificationChannel(CHANNEL_ID)?.name?.toString() != channelName) {
             manager.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, getString(R.string.channel_name), NotificationManager.IMPORTANCE_LOW).apply {
+                NotificationChannel(CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW).apply {
                     setShowBadge(false)
                 },
             )
@@ -292,7 +313,7 @@ class ScoreboardService : Service() {
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_scoreboard)
             .setContentTitle(currentTitle())
-            .setContentText(getString(R.string.notification_text))
+            .setContentText(textContext.getString(R.string.notification_text))
             .setContentIntent(openScoreboardIntent())
             .setOngoing(true)
             .setShowWhen(false)

@@ -48,6 +48,8 @@
     <string name="menu_section_display">Display</string>
     <string name="menu_section_watch">Watch / media control</string>
     <string name="menu_section_log">Recent remote commands</string>
+    <string name="menu_language">Language</string>
+    <string name="language_system">System</string>
     <string name="menu_section_about">About</string>
     <string name="setting_keep_screen_on">Keep screen on</string>
     <string name="setting_max_brightness">Full brightness</string>
@@ -65,5 +67,6 @@
     <string name="setting_claim_keys_note">Plays 0.3 s of silence when the scoreboard opens, so headset and Bluetooth media keys are sent here.</string>
     <string name="log_empty">Nothing received yet.</string>
     <string name="log_ignored">ignored</string>
-    <string name="about_text">Score digits: B612 Bold (subset), © The B612 Project Authors, SIL Open Font License 1.1. No network access, accounts, ads or analytics.</string>
+    <string name="about_text" translatable="false">Score digits: B612 Bold (subset), © The B612 Project Authors, SIL Open Font License 1.1.</string>
+    <string name="about_privacy">No network access, accounts, ads or analytics.</string>
 </resources>

@@ -22,7 +22,7 @@ wrapper downloads Gradle 9.7.1, Maven downloads the dependencies, and the foojay
 provisions a JDK 17 toolchain if none is installed.
 
 ```sh
-./gradlew assembleRelease   # app/build/outputs/apk/release/app-release.apk (R8-optimised, ~1 MB)
+./gradlew assembleRelease   # app/build/outputs/apk/release/app-release.apk (R8-optimised)
 ./gradlew assembleDebug     # app/build/outputs/apk/debug/app-debug.apk
 adb install -r app/build/outputs/apk/release/app-release.apk
 ```
@@ -64,6 +64,30 @@ Tests:
 
 The score and its undo history are saved on every change. They survive rotation, activity
 recreation and process restarts. Scores stop at 99.
+
+### Language and text
+
+The menu's top-right language picker offers **System**, **English**, **简体中文**, **繁體中文**,
+**日本語**, **한국어**, **Deutsch**, **Français**, and **Español**. System is the default: Android
+matches a supported system language, otherwise the UI falls back to English. The System label is
+translated; the other choices always use their native names. The selection survives restarts.
+Android 13+ also exposes these choices in Android's *App languages* settings; older versions store
+the selection locally.
+
+The Chinese app names are **场边记分牌 / 場邊記分牌**; Japanese uses **コートサイド** and Korean
+**코트사이드**. Buttons use short labels (for example, **交换**); instructions retain the fuller
+explanations. Controls, accessibility descriptions, notifications, and watch status text are
+translated. Raw remote-command diagnostics and third-party copyright/license notices remain
+English.
+
+UI text uses Android's **system sans-serif** family and locale-aware CJK fallback fonts. All
+languages share the same font sizes, weights, and line heights; exact glyph styling can vary with
+the device's system fonts. CJK fonts are not bundled. Additional font binaries are ignored by Git
+to prevent accidental staging.
+
+The only bundled font is the **B612 Bold** digit subset, `res/font/score_digits.ttf`. Its vector
+paths and fitting geometry are unchanged. Its license and source are in
+`app/src/main/assets/licenses/`.
 
 ## COROS APEX 4 setup
 

@@ -2,6 +2,7 @@ package io.github.bjin.courtside.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -22,11 +25,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +45,7 @@ import io.github.bjin.courtside.core.ActionKind
 import io.github.bjin.courtside.core.Feedback
 import io.github.bjin.courtside.core.RemoteLogEntry
 import io.github.bjin.courtside.core.Side
+import io.github.bjin.courtside.data.AppLanguage
 import io.github.bjin.courtside.data.Settings
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,6 +54,8 @@ import java.util.Locale
 @Composable
 fun MenuDialog(
     settings: Settings,
+    language: AppLanguage,
+    onLanguageSelected: (AppLanguage) -> Unit,
     remoteLog: List<RemoteLogEntry>,
     onUpdate: ((Settings) -> Settings) -> Unit,
     onSwap: () -> Unit,
@@ -65,6 +76,9 @@ fun MenuDialog(
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.weight(1f),
                         )
+                        LanguagePicker(language, onLanguageSelected)
+                    }
+                    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                         OutlinedButton(onClick = onSwap) { Text(stringResource(R.string.menu_swap)) }
                         Spacer(Modifier.width(8.dp))
                         OutlinedButton(onClick = onExit) { Text(stringResource(R.string.menu_exit)) }
@@ -85,6 +99,7 @@ fun MenuDialog(
                             Toggle(R.string.setting_dark, settings.darkTheme) { v -> onUpdate { it.copy(darkTheme = v) } }
                             SectionTitle(stringResource(R.string.menu_section_about))
                             Note(stringResource(R.string.about_text))
+                            Note(stringResource(R.string.about_privacy))
                         }
                         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                             SectionTitle(stringResource(R.string.menu_section_watch))
@@ -104,6 +119,35 @@ fun MenuDialog(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LanguagePicker(language: AppLanguage, onSelected: (AppLanguage) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val systemName = stringResource(R.string.language_system)
+    val currentName = if (language == AppLanguage.SYSTEM) systemName else language.nativeName
+    Box {
+        OutlinedButton(onClick = { expanded = true }) {
+            Text("${stringResource(R.string.menu_language)}: $currentName")
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            AppLanguage.entries.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            if (option == AppLanguage.SYSTEM) systemName else option.nativeName,
+                            fontWeight = if (option == language) FontWeight.Bold else FontWeight.Normal,
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        if (option != language) onSelected(option)
+                    },
+                    modifier = Modifier.semantics { selected = option == language },
+                )
             }
         }
     }
@@ -153,12 +197,11 @@ private fun LogLine(entry: RemoteLogEntry) {
     Column(Modifier.padding(vertical = 2.dp)) {
         Text(
             text = "${timeFormat.format(Date(entry.wallTimeMillis))}  ${entry.input} → $outcome",
-            fontFamily = FontFamily.Monospace,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
         )
         if (caller.isNotEmpty()) {
-            Text(caller.removePrefix(" · "), fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text(caller.removePrefix(" · "), fontSize = 11.sp)
         }
         Spacer(Modifier.height(2.dp))
     }

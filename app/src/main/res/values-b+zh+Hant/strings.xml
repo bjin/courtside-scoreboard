@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">場邊記分牌</string>
+    <string name="status_idle">場邊記分牌</string>
+    <string name="status_point_left">左側 +1</string>
+    <string name="status_point_right">右側 +1</string>
+    <string name="status_undo">復原</string>
+    <string name="status_reset">重設為 0 : 0</string>
+    <string name="status_swap">已交換雙方</string>
+    <string name="status_reset_armed">再按音量鍵 = 重設</string>
+    <string name="status_reset_cancelled">已取消重設</string>
+    <string name="status_nothing_to_undo">沒有可復原的操作</string>
+    <string name="status_max">最高 99 分</string>
+    <string name="channel_name">記分板</string>
+    <string name="notification_text">場邊記分牌執行中 · 手錶控制已啟用</string>
+    <string name="action_swap">交換</string>
+    <string name="action_undo">復原</string>
+    <string name="action_reset">重設</string>
+    <string name="status_reset_armed_screen">重設？再按音量鍵（%1$d）</string>
+    <string name="msg_remote_point_left">遙控：左側 +1</string>
+    <string name="msg_remote_point_right">遙控：右側 +1</string>
+    <string name="msg_remote_undo">遙控：復原</string>
+    <string name="msg_remote_reset">遙控：重設為 0 : 0</string>
+    <string name="msg_reset">重設為 0 : 0</string>
+    <string name="msg_swapped">已交換雙方</string>
+    <string name="msg_nothing_to_undo">沒有可復原的操作</string>
+    <string name="msg_max_score">最高為 99 分</string>
+    <string name="hint_hold_reset">長按「重設」，直到畫面填滿</string>
+    <string name="hint_back_again">再按一次返回以離開記分板</string>
+    <string name="cd_left_score">左側得分 %1$d。輕觸加一分。</string>
+    <string name="cd_right_score">右側得分 %1$d。輕觸加一分。</string>
+    <string name="cd_serving">贏得上一分，接下來發球</string>
+    <string name="cd_toggle_theme">切換淺色或深色背景</string>
+    <string name="cd_menu">選單</string>
+    <string name="cd_hold_reset">長按以重設為 0 : 0</string>
+    <string name="menu_title">場邊記分牌</string>
+    <string name="menu_swap">交換</string>
+    <string name="menu_exit">離開</string>
+    <string name="menu_close">關閉</string>
+    <string name="menu_section_display">顯示</string>
+    <string name="menu_section_watch">手錶 / 媒體控制</string>
+    <string name="menu_section_log">最近的遙控指令</string>
+    <string name="menu_section_about">關於</string>
+    <string name="setting_keep_screen_on">保持螢幕開啟</string>
+    <string name="setting_max_brightness">最高亮度</string>
+    <string name="setting_highlight_server">醒目標示贏得上一分的一方（該方發球）</string>
+    <string name="setting_lock_screen">在鎖定畫面上顯示</string>
+    <string name="setting_lock_screen_note">小米 / HyperOS：也請在應用程式的其他權限設定中允許\"在鎖定畫面上顯示\"。</string>
+    <string name="setting_haptics">輕觸時震動</string>
+    <string name="setting_dark">深色背景</string>
+    <string name="watch_mapping">COROS 媒體控制（或任何媒體遙控器）：\n上一首 = 左側 +1\n下一首 = 右側 +1\n播放 / 暫停 = 復原\n按兩次音量鍵（兩次之間稍作停頓，間隔不超過 5 秒）= 重設為 0 : 0</string>
+    <string name="setting_volume_reset">用手錶音量鍵重設比分</string>
+    <string name="setting_volume_reset_note">傳送到記分板的音量指令不會改變手機音量。關閉此選項後，音量指令會重新控制手機音量。</string>
+    <string name="setting_phone_volume">同時回應手機媒體音量變更</string>
+    <string name="setting_phone_volume_note">適用於直接變更手機音量的手錶應用程式：每次音量變更都視為按一次音量鍵，並立即還原原本的音量。</string>
+    <string name="setting_claim_keys">接收媒體按鍵</string>
+    <string name="setting_claim_keys_note">開啟記分板時播放 0.3 秒的靜音音訊，讓耳機及藍牙媒體按鍵指令傳送到此應用程式。</string>
+    <string name="log_empty">尚未收到任何指令。</string>
+    <string name="log_ignored">已忽略</string>
+    <string name="menu_language">語言</string>
+    <string name="language_system">系統語言</string>
+    <string name="about_privacy">不存取網路，無帳號、廣告或資料分析。</string>
+</resources>

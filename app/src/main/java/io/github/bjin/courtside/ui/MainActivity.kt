@@ -1,5 +1,6 @@
 package io.github.bjin.courtside.ui
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -10,6 +11,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,7 @@ import io.github.bjin.courtside.R
 import io.github.bjin.courtside.core.InputSource
 import io.github.bjin.courtside.core.RemoteInput
 import io.github.bjin.courtside.data.Settings
+import io.github.bjin.courtside.data.LanguageStore
 import io.github.bjin.courtside.media.ScoreboardService
 import io.github.bjin.courtside.scoreboardApp
 import kotlinx.coroutines.Job
@@ -41,10 +44,17 @@ class MainActivity : ComponentActivity() {
     private var backPressedAt = 0L
     private var menuOpen by mutableStateOf(false)
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LanguageStore.localizedContext(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        menuOpen = savedInstanceState?.getBoolean(MENU_OPEN) ?: false
         val app = scoreboardApp
         app.screens.opened()
+        // App-locale overrides can recreate the activity without refreshing the application store.
+        app.languages.refresh()
         val controller = app.controller
         val settingsStore = app.settings
         applyWindowSettings(settingsStore.settings.value)
@@ -69,37 +79,50 @@ class MainActivity : ComponentActivity() {
             val hintText by hint.collectAsStateWithLifecycle()
             // Left/right are physical sides of the phone, never mirrored for RTL languages.
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                ScoreboardScreen(
-                    ui = ScoreboardUi(
-                        score = score,
-                        feedback = feedback,
-                        resetArmedUntil = armedUntil,
-                        darkTheme = settings.darkTheme,
-                        haptics = settings.haptics,
-                        highlightServer = settings.highlightServer,
-                        hint = hintText,
-                    ),
-                    glyphs = glyphs,
-                    actions = actions,
-                )
-            }
-            if (menuOpen) {
-                val log by controller.remoteLog.collectAsStateWithLifecycle()
-                MenuDialog(
-                    settings = settings,
-                    remoteLog = log,
-                    onUpdate = settingsStore::update,
-                    onSwap = {
-                        controller.swapSides(InputSource.TOUCH)
-                        menuOpen = false
-                    },
-                    onExit = ::finish,
-                    onDismiss = { menuOpen = false },
-                )
+                MaterialTheme(typography = CourtsideTypography) {
+                    ScoreboardScreen(
+                        ui = ScoreboardUi(
+                            score = score,
+                            feedback = feedback,
+                            resetArmedUntil = armedUntil,
+                            darkTheme = settings.darkTheme,
+                            haptics = settings.haptics,
+                            highlightServer = settings.highlightServer,
+                            hint = hintText,
+                        ),
+                        glyphs = glyphs,
+                        actions = actions,
+                    )
+                    if (menuOpen) {
+                        val log by controller.remoteLog.collectAsStateWithLifecycle()
+                        val language by app.languages.language.collectAsStateWithLifecycle()
+                        MenuDialog(
+                            settings = settings,
+                            language = language,
+                            onLanguageSelected = {
+                                app.languages.select(it)
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) recreate()
+                            },
+                            remoteLog = log,
+                            onUpdate = settingsStore::update,
+                            onSwap = {
+                                controller.swapSides(InputSource.TOUCH)
+                                menuOpen = false
+                            },
+                            onExit = ::finish,
+                            onDismiss = { menuOpen = false },
+                        )
+                    }
+                }
             }
         }
 
         lifecycleScope.launch { settingsStore.settings.collect(::applyWindowSettings) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(MENU_OPEN, menuOpen)
+        super.onSaveInstanceState(outState)
     }
 
     /**
@@ -209,5 +232,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val EXIT_CONFIRM_MS = 2_500L
+        const val MENU_OPEN = "menu_open"
     }
 }
