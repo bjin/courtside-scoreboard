@@ -14,6 +14,9 @@ The half that won the last point is tinted (dark blue on dark, light blue on lig
 the rally winner serves next, so the tint shows who is serving. The watch title marks the same
 side with ●.
 
+For the early, unverified smartwatch and smart-band compatibility matrix, see
+[`docs/watch-compatibility.md`](docs/watch-compatibility.md).
+
 ## Build and install
 
 You need JDK 17 or newer and an Android SDK with platform 37 (set `sdk.dir` in
