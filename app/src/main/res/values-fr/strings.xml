@@ -38,7 +38,7 @@
     <string name="menu_exit">Quitter</string>
     <string name="menu_close">Fermer</string>
     <string name="menu_section_display">Affichage</string>
-    <string name="menu_section_watch">Montre / commandes multimédias</string>
+    <string name="menu_section_watch">Commandes multimédias de montres ou bracelets connectés</string>
     <string name="menu_section_log">Commandes à distance récentes</string>
     <string name="menu_section_about">À propos</string>
     <string name="menu_language">Langue</string>
@@ -46,15 +46,15 @@
     <string name="setting_keep_screen_on">Garder l\'écran allumé</string>
     <string name="setting_max_brightness">Luminosité maximale</string>
     <string name="setting_highlight_server">Mettre en évidence le côté qui a gagné le dernier point (il sert)</string>
-    <string name="setting_lock_screen">Afficher par-dessus l\'écran de verrouillage</string>
-    <string name="setting_lock_screen_note">Xiaomi / HyperOS : autorisez aussi \"Afficher sur l\'écran de verrouillage\" dans les autres autorisations de l\'application.</string>
+    <string name="setting_lock_screen">Afficher lorsque l\'écran est verrouillé</string>
+    <string name="setting_lock_screen_note">Utilise la fonction Android standard d\'affichage lorsque l\'écran est verrouillé. Certains fabricants peuvent aussi demander une autorisation supplémentaire dans les paramètres système.</string>
     <string name="setting_haptics">Vibrer au toucher</string>
     <string name="setting_dark">Fond sombre</string>
-    <string name="watch_mapping">COROS Media Control (ou toute télécommande multimédia) :\nPrécédent = gauche +1\nSuivant = droite +1\nLecture / Pause = ANNULER\nVolume deux fois (avec une pause entre les deux, en moins de 5 s) = RAZ (remise à zéro, 0 : 0)</string>
-    <string name="setting_volume_reset">Le volume de la montre remet le score à zéro</string>
+    <string name="watch_mapping">Commandes multimédias de montres ou bracelets connectés (la compatibilité varie selon le modèle) :\nPrécédent = gauche +1\nSuivant = droite +1\nLecture / Pause = ANNULER\nVolume deux fois (avec une pause entre les deux, en moins de 5 s) = RAZ (remise à zéro, 0 : 0)</string>
+    <string name="setting_volume_reset">Le volume de la montre ou du bracelet remet le score à zéro</string>
     <string name="setting_volume_reset_note">Les commandes de volume envoyées au tableau de score ne modifient jamais le volume du téléphone. Désactivez cette option pour contrôler à nouveau le volume du téléphone.</string>
     <string name="setting_phone_volume">Utiliser aussi les changements de volume multimédia du téléphone</string>
-    <string name="setting_phone_volume_note">Pour les applications de montre qui modifient directement le volume du téléphone : chaque changement compte comme un appui sur le volume, puis le volume initial est rétabli immédiatement.</string>
+    <string name="setting_phone_volume_note">Pour les applications de montres ou bracelets connectés qui modifient directement le volume du téléphone : chaque changement compte comme un appui sur le volume, puis le volume initial est rétabli immédiatement.</string>
     <string name="setting_claim_keys">Recevoir les boutons multimédias</string>
     <string name="setting_claim_keys_note">Lit 0,3 s de silence à l\'ouverture du tableau de score pour que les commandes multimédias des casques et appareils Bluetooth lui soient envoyées.</string>
     <string name="log_empty">Aucune commande reçue pour le moment.</string>

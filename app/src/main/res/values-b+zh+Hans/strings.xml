@@ -38,21 +38,21 @@
     <string name="menu_exit">退出</string>
     <string name="menu_close">关闭</string>
     <string name="menu_section_display">显示</string>
-    <string name="menu_section_watch">手表 / 媒体控制</string>
+    <string name="menu_section_watch">手表/手环媒体控制</string>
     <string name="menu_section_log">最近的遥控指令</string>
     <string name="menu_section_about">关于</string>
     <string name="setting_keep_screen_on">保持屏幕常亮</string>
     <string name="setting_max_brightness">最高亮度</string>
     <string name="setting_highlight_server">突出显示赢得上一分的一方（该方发球）</string>
-    <string name="setting_lock_screen">在锁屏上显示</string>
-    <string name="setting_lock_screen_note">小米 / HyperOS：还需在应用的其他权限中允许\"锁屏显示\"。</string>
+    <string name="setting_lock_screen">锁定时显示</string>
+    <string name="setting_lock_screen_note">使用 Android 的标准“锁定时显示”功能。某些设备制造商可能还要求在系统设置中授予额外权限。</string>
     <string name="setting_haptics">点按时振动</string>
     <string name="setting_dark">深色背景</string>
-    <string name="watch_mapping">COROS 媒体控制（或任何媒体遥控器）：\n上一曲 = 左侧 +1\n下一曲 = 右侧 +1\n播放 / 暂停 = 撤销\n按两次音量键（两次之间稍作停顿，间隔不超过 5 秒）= 重置为 0 : 0</string>
-    <string name="setting_volume_reset">用手表音量键重置比分</string>
+    <string name="watch_mapping">手表/手环媒体控制（支持因型号而异）：\n上一曲 = 左侧 +1\n下一曲 = 右侧 +1\n播放 / 暂停 = 撤销\n按两次音量键（两次之间稍作停顿，间隔不超过 5 秒）= 重置为 0 : 0</string>
+    <string name="setting_volume_reset">用手表/手环音量键重置比分</string>
     <string name="setting_volume_reset_note">发送到记分牌的音量指令不会改变手机音量。关闭此选项后，音量指令将重新控制手机音量。</string>
     <string name="setting_phone_volume">同时响应手机媒体音量变化</string>
-    <string name="setting_phone_volume_note">适用于直接改变手机音量的手表应用：每次音量变化均视为按一次音量键，并立即恢复原音量。</string>
+    <string name="setting_phone_volume_note">适用于直接改变手机音量的手表/手环应用：每次音量变化均视为按一次音量键，并立即恢复原音量。</string>
     <string name="setting_claim_keys">接收媒体按键</string>
     <string name="setting_claim_keys_note">打开记分牌时播放 0.3 秒静音，让耳机和蓝牙媒体按键指令发送到此应用。</string>
     <string name="log_empty">尚未收到任何指令。</string>

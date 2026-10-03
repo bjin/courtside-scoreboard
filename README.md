@@ -62,8 +62,8 @@ Tests:
 - **Back twice** leaves the scoreboard. One stray back gesture only shows a hint.
 - Every change briefly flashes the half that changed. Remote changes also show a short
   "Remote: …" line above the digits.
-- By default the screen stays on, runs at full brightness, and the scoreboard shows over the
-  lock screen. Each of these is a switch in the menu.
+- By default the screen stays on, runs at full brightness, and the scoreboard shows when the
+  phone is locked. Each of these is a switch in the menu.
 
 The score and its undo history are saved on every change. They survive rotation, activity
 recreation and process restarts. Scores stop at 99.
@@ -102,8 +102,8 @@ paths and fitting geometry are unchanged. Its license and source are in
 2. On HyperOS, also set **Courtside** to *Battery saver: No restrictions*. Without it HyperOS
    freezes the app as soon as it is not on screen (screen off, another app in front), even with its
    media service running, and watch buttons are only applied when you come back. Don't clear
-   Courtside from the recent apps during a match: HyperOS force-stops it. If you want *Show over
-   the lock screen*, also allow *Show on Lock screen* in the app's *Other permissions*.
+   Courtside from the recent apps during a match: HyperOS force-stops it. If you want
+   *Show when locked*, also allow *Show on Lock screen* in the app's *Other permissions*.
 3. Open Courtside. A "Courtside" media notification appears and the session reports
    "playing". On the watch, open Media Control: Toolbox (long-press Back) → Media Control, or
    use the *Switch View* shortcut during an activity. It shows **○ 0 : 0 ○** as the title.
@@ -236,7 +236,7 @@ using a debug build that logged every input:
 - **Reset is not undoable**: by requirement, reset clears the history, so both the on-screen and
   the remote reset need a deliberate second action.
 - **HyperOS**: battery management freezes or force-stops background apps; see setup step 2.
-  *Show over the lock screen* needs the extra *Show on Lock screen* permission. Starting with
+  *Show when locked* needs the extra *Show on Lock screen* permission. Starting with
   Android 16, Android ignores the fixed landscape orientation on large screens (tablets); phones
   are unaffected.
 - **Future Android versions**: Android 17 restricts volume changes from apps without a visible

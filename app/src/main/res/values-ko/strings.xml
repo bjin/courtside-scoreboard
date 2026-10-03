@@ -41,7 +41,7 @@
     <string name="menu_exit">종료</string>
     <string name="menu_close">닫기</string>
     <string name="menu_section_display">화면</string>
-    <string name="menu_section_watch">워치 / 미디어 제어</string>
+    <string name="menu_section_watch">스마트워치 / 스마트밴드 미디어 제어</string>
     <string name="menu_section_log">최근 원격 명령</string>
     <string name="menu_section_about">앱 정보</string>
     <string name="menu_language">언어</string>
@@ -49,15 +49,15 @@
     <string name="setting_keep_screen_on">화면 켜짐 유지</string>
     <string name="setting_max_brightness">최대 밝기</string>
     <string name="setting_highlight_server">직전에 득점한 쪽 강조 표시 (서브권 보유)</string>
-    <string name="setting_lock_screen">잠금 화면 위에 표시</string>
-    <string name="setting_lock_screen_note">Xiaomi / HyperOS: 앱의 기타 권한에서도 \"잠금 화면에 표시\"를 허용하세요.</string>
+    <string name="setting_lock_screen">잠금 상태에서 표시</string>
+    <string name="setting_lock_screen_note">Android의 표준 잠금 상태 표시 기능을 사용합니다. 일부 제조업체에서는 시스템 설정에서 추가 권한이 필요할 수 있습니다.</string>
     <string name="setting_haptics">탭할 때 진동</string>
     <string name="setting_dark">어두운 배경</string>
-    <string name="watch_mapping">COROS 미디어 제어 (또는 다른 미디어 리모컨):\n이전 = 왼쪽 +1\n다음 = 오른쪽 +1\n재생 / 일시 정지 = 되돌리기\n음량을 두 번 조작 (중간에 간격을 두고 5초 이내) = 0 : 0으로 초기화</string>
-    <string name="setting_volume_reset">워치 음량 조작으로 점수 초기화</string>
+    <string name="watch_mapping">스마트워치 / 스마트밴드 미디어 제어 (모델에 따라 지원 여부가 다름):\n이전 = 왼쪽 +1\n다음 = 오른쪽 +1\n재생 / 일시 정지 = 되돌리기\n음량을 두 번 조작 (중간에 간격을 두고 5초 이내) = 0 : 0으로 초기화</string>
+    <string name="setting_volume_reset">스마트워치 / 스마트밴드 음량 조작으로 점수 초기화</string>
     <string name="setting_volume_reset_note">점수판으로 전송되는 음량 명령은 휴대전화 음량을 바꾸지 않습니다. 끄면 다시 휴대전화 음량을 조절할 수 있습니다.</string>
     <string name="setting_phone_volume">휴대전화 미디어 음량 변경도 사용</string>
-    <string name="setting_phone_volume_note">휴대전화 음량을 직접 바꾸는 워치 앱용: 음량이 바뀔 때마다 음량 버튼을 누른 것으로 처리하고 음량을 즉시 원래대로 되돌립니다.</string>
+    <string name="setting_phone_volume_note">휴대전화 음량을 직접 변경하는 스마트워치 / 스마트밴드 앱용: 음량이 바뀔 때마다 음량 버튼을 누른 것으로 처리하고 음량을 즉시 원래대로 되돌립니다.</string>
     <string name="setting_claim_keys">미디어 버튼 입력 받기</string>
     <string name="setting_claim_keys_note">점수판을 열 때 0.3초 동안 무음을 재생하여 헤드셋과 Bluetooth 미디어 키 입력을 이 앱으로 받습니다.</string>
     <string name="log_empty">아직 받은 명령이 없습니다.</string>

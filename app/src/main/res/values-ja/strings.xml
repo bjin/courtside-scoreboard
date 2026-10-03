@@ -41,7 +41,7 @@
     <string name="menu_exit">終了</string>
     <string name="menu_close">閉じる</string>
     <string name="menu_section_display">表示</string>
-    <string name="menu_section_watch">ウォッチ / メディア操作</string>
+    <string name="menu_section_watch">スマートウォッチ / スマートバンドのメディア操作</string>
     <string name="menu_section_log">最近のリモート操作</string>
     <string name="menu_section_about">このアプリについて</string>
     <string name="menu_language">言語</string>
@@ -49,15 +49,15 @@
     <string name="setting_keep_screen_on">画面を常にオンにする</string>
     <string name="setting_max_brightness">明るさを最大にする</string>
     <string name="setting_highlight_server">直前のポイントを取った側（サーブ側）を強調表示</string>
-    <string name="setting_lock_screen">ロック画面の上に表示</string>
-    <string name="setting_lock_screen_note">Xiaomi / HyperOS：アプリのその他の権限でも \"ロック画面に表示\" を許可してください。</string>
+    <string name="setting_lock_screen">ロック中に表示</string>
+    <string name="setting_lock_screen_note">Android標準のロック中表示機能を使用します。一部のメーカーでは、システム設定で追加の権限が必要な場合があります。</string>
     <string name="setting_haptics">タップ時に振動</string>
     <string name="setting_dark">暗い背景</string>
-    <string name="watch_mapping">COROSのメディア操作（または他のメディアリモコン）：\n前へ = 左 +1\n次へ = 右 +1\n再生 / 一時停止 = 取り消し\n音量を2回操作（間を空けて5秒以内）= 0 : 0 にリセット</string>
-    <string name="setting_volume_reset">ウォッチの音量操作でスコアをリセット</string>
+    <string name="watch_mapping">スマートウォッチ / スマートバンドのメディア操作（対応状況はモデルによって異なります）：\n前へ = 左 +1\n次へ = 右 +1\n再生 / 一時停止 = 取り消し\n音量を2回操作（間を空けて5秒以内）= 0 : 0 にリセット</string>
+    <string name="setting_volume_reset">スマートウォッチ / スマートバンドの音量操作でスコアをリセット</string>
     <string name="setting_volume_reset_note">スコアボードに送られる音量操作では、スマートフォンの音量は変わりません。オフにすると、再びスマートフォンの音量を調整できます。</string>
     <string name="setting_phone_volume">スマートフォンのメディア音量の変更も使う</string>
-    <string name="setting_phone_volume_note">スマートフォンの音量を直接変更するウォッチアプリ向け：変更のたびに音量操作として扱い、音量はすぐに元に戻します。</string>
+    <string name="setting_phone_volume_note">スマートウォッチ / スマートバンドからスマートフォンの音量を直接変更するアプリ向け：変更のたびに音量操作として扱い、音量はすぐに元に戻します。</string>
     <string name="setting_claim_keys">メディアボタンの操作を受け取る</string>
     <string name="setting_claim_keys_note">スコアボードを開くと0.3秒間の無音を再生し、ヘッドセットやBluetoothのメディアキー操作をこのアプリで受け取れるようにします。</string>
     <string name="log_empty">まだ操作を受け取っていません。</string>

@@ -38,7 +38,7 @@
     <string name="menu_exit">Beenden</string>
     <string name="menu_close">Schließen</string>
     <string name="menu_section_display">Anzeige</string>
-    <string name="menu_section_watch">Uhr / Mediensteuerung</string>
+    <string name="menu_section_watch">Smartwatch-/Smartband-Mediensteuerung</string>
     <string name="menu_section_log">Letzte Fernsteuerungsbefehle</string>
     <string name="menu_section_about">Über die App</string>
     <string name="menu_language">Sprache</string>
@@ -46,15 +46,15 @@
     <string name="setting_keep_screen_on">Bildschirm eingeschaltet lassen</string>
     <string name="setting_max_brightness">Volle Helligkeit</string>
     <string name="setting_highlight_server">Seite hervorheben, die den letzten Punkt gewonnen hat (sie schlägt auf)</string>
-    <string name="setting_lock_screen">Über dem Sperrbildschirm anzeigen</string>
-    <string name="setting_lock_screen_note">Xiaomi / HyperOS: In den weiteren App-Berechtigungen auch \"Auf Sperrbildschirm anzeigen\" erlauben.</string>
+    <string name="setting_lock_screen">Bei gesperrtem Gerät anzeigen</string>
+    <string name="setting_lock_screen_note">Verwendet die standardmäßige Android-Funktion zum Anzeigen bei gesperrtem Gerät. Einige Hersteller können zusätzlich eine Berechtigung in den Systemeinstellungen verlangen.</string>
     <string name="setting_haptics">Beim Tippen vibrieren</string>
     <string name="setting_dark">Dunkler Hintergrund</string>
-    <string name="watch_mapping">COROS Media Control (oder eine andere Medienfernbedienung):\nZurück = links +1\nWeiter = rechts +1\nWiedergabe / Pause = RÜCKGÄNGIG\nLautstärke zweimal (mit Pause dazwischen, innerhalb von 5 s) = NULLEN (0 : 0)</string>
-    <string name="setting_volume_reset">Uhr-Lautstärketasten setzen den Punktestand zurück</string>
+    <string name="watch_mapping">Mediensteuerung per Smartwatch oder Smartband (Unterstützung je nach Modell unterschiedlich):\nZurück = links +1\nWeiter = rechts +1\nWiedergabe / Pause = RÜCKGÄNGIG\nLautstärke zweimal (mit Pause dazwischen, innerhalb von 5 s) = NULLEN (0 : 0)</string>
+    <string name="setting_volume_reset">Die Lautstärke von Smartwatch oder Smartband setzt den Punktestand zurück</string>
     <string name="setting_volume_reset_note">Lautstärkebefehle an die Anzeigetafel ändern nie die Telefonlautstärke. Ausschalten, um wieder die Telefonlautstärke zu steuern.</string>
     <string name="setting_phone_volume">Auch Änderungen der Medienlautstärke am Telefon nutzen</string>
-    <string name="setting_phone_volume_note">Für Uhr-Apps, die die Telefonlautstärke direkt ändern: Jede Änderung zählt als Druck auf eine Lautstärketaste. Die Lautstärke wird sofort wiederhergestellt.</string>
+    <string name="setting_phone_volume_note">Für Smartwatch- oder Smartband-Apps, die die Telefonlautstärke direkt ändern: Jede Änderung zählt als Druck auf eine Lautstärketaste. Die Lautstärke wird sofort wiederhergestellt.</string>
     <string name="setting_claim_keys">Medientasten empfangen</string>
     <string name="setting_claim_keys_note">Spielt beim Öffnen der Anzeigetafel 0,3 s Stille ab, damit Medientasten von Headsets und Bluetooth-Geräten hierher geleitet werden.</string>
     <string name="log_empty">Noch nichts empfangen.</string>
