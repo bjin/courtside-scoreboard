@@ -135,4 +135,4 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           gh release create "$RELEASE_TAG" release-apk/app-release.apk \
-            --verify-tag --title "$RELEASE_TAG" --generate-notes
+            --verify-tag --title "$RELEASE_TAG" --generate-notes --prerelease

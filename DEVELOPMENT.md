@@ -168,9 +168,8 @@ bash tools/git-version.sh
   clean, tagged commits. Do not rewrite published release history, and create a new commit for
   each new release rather than adding multiple release tags to the same commit.
 
-There is no version tag or published release yet. When deliberately preparing the first release,
-commit all intended changes and complete verification first, then manually create and push an
-annotated tag:
+When preparing a release, commit all intended changes and complete verification first, then
+manually create and push an annotated tag. For example, the initial release uses:
 
 ```sh
 git tag -a v0.1.0 -m "Courtside 0.1.0"
@@ -192,13 +191,13 @@ and pull requests targeting any branch. Checkouts fetch full history and tags fo
 2. **Signed APK:** after tests pass, branch/tag pushes build and verify a signed release APK.
    The run's artifact is named `courtside-release-<commit SHA>`. APK and test-report artifacts
    are retained for 30 days. Pull requests run tests only and never receive signing secrets.
-3. **Publish:** only a `v*` tag push downloads that same verified APK, creates a GitHub Release
-   with generated notes, and attaches `app-release.apk`. The tag must already exist on GitHub.
+3. **Publish:** only a `v*` tag push downloads that same verified APK, creates a GitHub
+   **pre-release** with generated notes, and attaches `app-release.apk`. The tag must already
+   exist on GitHub. Tag publishing remains pre-release-only until the release policy changes.
    Only this job has `contents: write`; it receives no signing secrets and does not execute
    checked-out repository code. Branch pushes and pull requests do not create releases.
 
-This describes the implemented workflow, not an existing downloadable release. Configure these
-repository Actions secrets before expecting a signed push build to succeed:
+Configure these repository Actions secrets before expecting a signed push build to succeed:
 
 | Actions secret | Contents |
 |---|---|
