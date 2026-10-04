@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+// SPDX-License-Identifier: MIT
+
 package io.github.bjin.courtside.core
 
 import kotlin.math.hypot

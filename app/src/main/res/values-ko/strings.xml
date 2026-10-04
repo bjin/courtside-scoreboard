@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+     SPDX-License-Identifier: MIT -->
 <resources>
     <string name="app_name">코트사이드</string>
     <string name="status_idle">코트사이드</string>
@@ -63,4 +65,5 @@
     <string name="log_empty">아직 받은 명령이 없습니다.</string>
     <string name="log_ignored">무시됨</string>
     <string name="about_privacy">네트워크 접속, 계정, 광고, 분석 기능이 없습니다.</string>
+    <string name="about_mit_summary">MIT: 사용·수정·배포·판매는 자유이며, 저작권 및 허가 고지를 유지해야 합니다. 보증은 제공되지 않습니다.</string>
 </resources>

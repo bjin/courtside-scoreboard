@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+     SPDX-License-Identifier: MIT -->
 <resources>
     <string name="app_name">场边记分牌</string>
     <string name="status_idle">场边记分牌</string>
@@ -60,4 +62,5 @@
     <string name="menu_language">语言</string>
     <string name="language_system">系统语言</string>
     <string name="about_privacy">不访问网络，无账号、广告或数据分析。</string>
+    <string name="about_mit_summary">MIT：可自由使用、修改、分发和销售；须保留版权及许可声明，不提供担保。</string>
 </resources>

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+     SPDX-License-Identifier: MIT -->
 <resources>
     <string name="app_name">コートサイド</string>
     <string name="status_idle">コートサイド</string>
@@ -63,4 +65,5 @@
     <string name="log_empty">まだ操作を受け取っていません。</string>
     <string name="log_ignored">無視</string>
     <string name="about_privacy">ネットワークアクセス、アカウント、広告、利用状況の分析はありません。</string>
+    <string name="about_mit_summary">MIT：使用・改変・再配布・販売は自由です。著作権と許諾の表示を保持してください。無保証です。</string>
 </resources>

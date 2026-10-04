@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+// SPDX-License-Identifier: MIT
+
 package io.github.bjin.courtside.ui
 
 import androidx.compose.foundation.clickable
@@ -31,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -63,6 +67,10 @@ fun MenuDialog(
     onDismiss: () -> Unit,
 ) {
     val colors = if (settings.darkTheme) darkColorScheme() else lightColorScheme()
+    val context = LocalContext.current
+    val projectLicense = remember(context) {
+        context.assets.open("licenses/Courtside-MIT.txt").bufferedReader().use { it.readText() }
+    }
     MaterialTheme(colorScheme = colors) {
         Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
             Surface(
@@ -99,6 +107,8 @@ fun MenuDialog(
                             Toggle(R.string.setting_dark, settings.darkTheme) { v -> onUpdate { it.copy(darkTheme = v) } }
                             SectionTitle(stringResource(R.string.menu_section_about))
                             Note(stringResource(R.string.about_text))
+                            Note(stringResource(R.string.about_mit_summary))
+                            Note(projectLicense)
                             Note(stringResource(R.string.about_privacy))
                         }
                         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 <!-- Status bar icon: "1 | 0" silhouette (white on transparent). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"

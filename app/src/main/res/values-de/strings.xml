@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+     SPDX-License-Identifier: MIT -->
 <resources>
     <string name="app_name">Courtside</string>
     <string name="status_idle">Courtside</string>
@@ -60,4 +62,5 @@
     <string name="log_empty">Noch nichts empfangen.</string>
     <string name="log_ignored">ignoriert</string>
     <string name="about_privacy">Kein Netzwerkzugriff, keine Konten, Werbung oder Nutzungsanalyse.</string>
+    <string name="about_mit_summary">MIT: frei nutzen, ändern, weitergeben und verkaufen; Copyright- und Lizenzhinweise beibehalten; ohne Gewähr.</string>
 </resources>

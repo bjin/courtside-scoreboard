@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+// SPDX-License-Identifier: MIT
+
 package io.github.bjin.courtside.ui
 
 import androidx.compose.material3.Typography

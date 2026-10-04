@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Bin Jin <bjin@protonmail.com>
+     SPDX-License-Identifier: MIT -->
 <resources>
     <string name="app_name">Courtside</string>
 
@@ -68,5 +70,6 @@
     <string name="log_empty">Nothing received yet.</string>
     <string name="log_ignored">ignored</string>
     <string name="about_text" translatable="false">Score digits: B612 Bold (subset), © The B612 Project Authors, SIL Open Font License 1.1.</string>
+    <string name="about_mit_summary">MIT: freely use, modify, share and sell; retain copyright and license notices; no warranty.</string>
     <string name="about_privacy">No network access, accounts, ads or analytics.</string>
 </resources>
