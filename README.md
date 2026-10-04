@@ -69,16 +69,51 @@ Tests:
 ./gradlew connectedDebugAndroidTest  # device/emulator: drives the real MediaSession via MediaController
 ```
 
+### App versions
+
+`app/build.gradle.kts` reads both Android version fields from `tools/git-version.sh`;
+do not edit hard-coded version numbers. Run `bash tools/git-version.sh` to preview them.
+Git and Bash are required, and the checkout must include full history and version tags
+(`git fetch --unshallow --tags` if it is shallow).
+
+- **`versionName`** is the user-visible version. At tag `v0.1.0`, it is `0.1.0`.
+  Twelve commits after that tag, it is `0.1.0.r12.gxxxxxxxx`, where the hash has at least
+  eight characters. The base is the nearest reachable `vMAJOR.MINOR.PATCH` tag.
+  Before the first version tag, the base is `0.0.0` and the revision is the total commit count.
+- **`versionCode`** is the total number of commits reachable from HEAD. Android uses this
+  integer, not `versionName`, to order updates. It increases along descendant history.
+  Different branches can share a code; moving between arbitrary branch builds does not
+  guarantee an upgrade. Do not rewrite published release history, and make a new commit
+  for each new release rather than adding another version tag to the same commit.
+
+Versions identify committed history; uncommitted edits do not change them. Build official
+releases from clean, tagged commits. When ready to release, commit all intended changes first,
+then create and push an annotated tag (these are manual commands, not build side effects):
+
+```sh
+git tag -a v0.1.0 -m "Courtside 0.1.0"
+git push origin master
+git push origin v0.1.0
+```
+
+Choose the next `vMAJOR.MINOR.PATCH` tag for later releases. No source-file version bump is needed.
+
 ### GitHub Actions
 
-`.github/workflows/ci.yml` runs on pushes to every branch and on pull requests targeting any
-branch. The tests job runs all JVM tests, Android lint, and all instrumented tests on an
-Android 16 emulator. Pull requests run tests only; they never receive release signing secrets.
+`.github/workflows/ci.yml` runs on pushes to every branch, `v*` tag pushes, and pull requests
+targeting any branch. Checkouts fetch full Git history and tags for version generation.
+The tests job runs all JVM tests, Android lint, and all instrumented tests on an Android 16
+emulator. Pull requests run tests only; they never receive release signing secrets.
 
-After successful tests, branch pushes build and verify a signed release APK. Download it from
-the run's `courtside-release-<commit SHA>` artifact; test and lint reports are also uploaded.
-Artifacts are retained for 30 days. Publishing `v*` tags as GitHub Release assets is not yet
-configured.
+After successful tests, branch and tag pushes build and verify a signed release APK. Download
+it from the run's `courtside-release-<commit SHA>` artifact; test and lint reports are also
+uploaded. Artifacts are retained for 30 days.
+
+On `v*` tag pushes, a final job downloads that same signed APK, creates a GitHub Release with
+generated notes, and uploads `app-release.apk` as a release asset. Only this publishing job has
+`contents: write`; it receives no signing secrets and does not execute repository code.
+Branch pushes and pull requests never create releases. The tag must already exist on GitHub.
+Publishing a release does not change repository visibility.
 
 The signing job restores its temporary keystore from these repository Actions secrets:
 `ANDROID_RELEASE_KEYSTORE_BASE64`, `ANDROID_RELEASE_STORE_PASSWORD`,

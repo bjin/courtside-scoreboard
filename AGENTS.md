@@ -76,8 +76,11 @@ Instrumented tests reach the session through `ScoreboardApp.sessionToken` + `Med
 Release signing requires `COURTSIDE_RELEASE_KEYSTORE`, `COURTSIDE_RELEASE_STORE_PASSWORD`,
 `COURTSIDE_RELEASE_KEY_ALIAS`, and `COURTSIDE_RELEASE_KEY_PASSWORD`; credentials stay outside
 the repository. The maintainer's local environment is `$HOME/.config/courtside/signing/release.env`.
-CI runs all JVM and instrumented tests on branch pushes and pull requests; only branch pushes
-build signed release APK artifacts. Never expose signing secrets to pull-request code.
+App versions come from `tools/git-version.sh`: `versionName` uses the nearest `vMAJOR.MINOR.PATCH`
+tag and commit distance; `versionCode` counts reachable commits. Full Git history is required.
+CI runs all JVM and instrumented tests on branch/tag pushes and pull requests; only pushes
+build signed release APK artifacts. `v*` tag pushes additionally publish the APK as a GitHub
+Release asset. Never expose signing secrets to pull-request code.
 
 ## Emulator instrumentation
 ```sh

@@ -1,9 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
 }
 
 val releaseKeystore = providers.environmentVariable("COURTSIDE_RELEASE_KEYSTORE").orNull
+
+val gitVersion = Properties().apply {
+    val output = providers.exec {
+        workingDir(rootDir)
+        commandLine("bash", rootProject.file("tools/git-version.sh").absolutePath)
+    }.standardOutput.asText.get()
+    load(output.reader())
+}
 
 android {
     namespace = "io.github.bjin.courtside"
@@ -14,8 +24,8 @@ android {
         minSdk = 26
         // The target phone runs Android 16 (API 36); keep its behaviour on newer emulators too.
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = gitVersion.getProperty("versionCode").toInt()
+        versionName = gitVersion.getProperty("versionName")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
