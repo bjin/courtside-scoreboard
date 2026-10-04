@@ -25,23 +25,67 @@ wrapper downloads Gradle 9.7.1, Maven downloads the dependencies, and the foojay
 provisions a JDK 17 toolchain if none is installed.
 
 ```sh
-./gradlew assembleRelease   # app/build/outputs/apk/release/app-release.apk (R8-optimised)
 ./gradlew assembleDebug     # app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleRelease   # R8-optimised; unsigned unless release credentials are exported
+```
+
+Release signing uses a dedicated key, not the development debug key. Export all four variables
+to produce `app/build/outputs/apk/release/app-release.apk`:
+
+| Variable | Value |
+|---|---|
+| `COURTSIDE_RELEASE_KEYSTORE` | Absolute path to the private release keystore |
+| `COURTSIDE_RELEASE_STORE_PASSWORD` | Keystore password |
+| `COURTSIDE_RELEASE_KEY_ALIAS` | Signing-key alias |
+| `COURTSIDE_RELEASE_KEY_PASSWORD` | Signing-key password |
+
+Keep the keystore and passwords outside the repository and back them up securely. The
+maintainer's local credentials are stored in `$HOME/.config/courtside/signing/release.env`:
+
+```sh
+source "$HOME/.config/courtside/signing/release.env"
+./gradlew assembleRelease
 adb install -r app/build/outputs/apk/release/app-release.apk
 ```
 
-The release build is signed with the local debug key, so it installs without keystore setup.
-That is fine for personal sideloading; use your own key before you distribute it. Prefer the
-release build for matches: it starts faster and responds faster than the debug build.
+Without release credentials, the output is `app-release-unsigned.apk`; it cannot be installed
+until signed. The dedicated release certificate's SHA-256 fingerprint is:
+
+```text
+f0448bf1836fa1d6c62fc1aa54f9c9b57c48572e57178bfb6c4c39bd96eb8d43
+```
+
+The first dedicated-key release cannot directly upgrade an older debug-signed installation.
+A one-time uninstall/reinstall clears saved scores, history, and settings. Subsequent releases
+must keep this signing identity and increase `versionCode`. Prefer the release build for
+matches: it starts faster and responds faster than the debug build.
 To install over Wi-Fi, enable *Wireless debugging* on the phone, then run
 `adb pair <ip:port>` and `adb connect <ip:port>`.
 
 Tests:
 
 ```sh
-./gradlew testDebugUnitTest          # JVM: score/history, undo, reset guard, media mapping, layout
+./gradlew test lintDebug             # all JVM tests plus Android lint
 ./gradlew connectedDebugAndroidTest  # device/emulator: drives the real MediaSession via MediaController
 ```
+
+### GitHub Actions
+
+`.github/workflows/ci.yml` runs on pushes to every branch and on pull requests targeting any
+branch. The tests job runs all JVM tests, Android lint, and all instrumented tests on an
+Android 16 emulator. Pull requests run tests only; they never receive release signing secrets.
+
+After successful tests, branch pushes build and verify a signed release APK. Download it from
+the run's `courtside-release-<commit SHA>` artifact; test and lint reports are also uploaded.
+Artifacts are retained for 30 days. Publishing `v*` tags as GitHub Release assets is not yet
+configured.
+
+The signing job restores its temporary keystore from these repository Actions secrets:
+`ANDROID_RELEASE_KEYSTORE_BASE64`, `ANDROID_RELEASE_STORE_PASSWORD`,
+`ANDROID_RELEASE_KEY_ALIAS`, and `ANDROID_RELEASE_KEY_PASSWORD`. Base64 is only a transport
+encoding: keep the encoded keystore secret too. The temporary keystore is removed after the
+build, and release builds disable Gradle's configuration cache to avoid retaining credentials.
+
 
 ## Using the scoreboard
 

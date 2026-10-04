@@ -68,11 +68,16 @@ Requires JDK 17+ and an Android SDK (`ANDROID_HOME` or `local.properties`). Vers
 kotlin-android plugin); targetSdk matches the Android 16 phone. In the agent shell, export the SDK
 variables explicitly (`source <(…)` hung there) and run gradlew with `</dev/null`.
 ```sh
-./gradlew assembleDebug assembleRelease   # release: R8, signed with the local debug key
-./gradlew testDebugUnitTest lintDebug      # lint must stay free of errors
+./gradlew assembleDebug assembleRelease   # release: R8; unsigned without release credentials
+./gradlew test lintDebug                  # all JVM tests; lint must stay free of errors
 ./gradlew connectedDebugAndroidTest        # emulator/device; uninstalls the app afterwards
 ```
 Instrumented tests reach the session through `ScoreboardApp.sessionToken` + `MediaController`.
+Release signing requires `COURTSIDE_RELEASE_KEYSTORE`, `COURTSIDE_RELEASE_STORE_PASSWORD`,
+`COURTSIDE_RELEASE_KEY_ALIAS`, and `COURTSIDE_RELEASE_KEY_PASSWORD`; credentials stay outside
+the repository. The maintainer's local environment is `$HOME/.config/courtside/signing/release.env`.
+CI runs all JVM and instrumented tests on branch pushes and pull requests; only branch pushes
+build signed release APK artifacts. Never expose signing secrets to pull-request code.
 
 ## Emulator instrumentation
 ```sh
