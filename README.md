@@ -77,7 +77,7 @@ German, French, and Spanish are available in the menu.
 ## Install
 
 Requires **Android 8.0 or newer**. Visit [Releases](https://github.com/bjin/courtside-scoreboard/releases)
-and download `app-release.apk` from your chosen release, then open it on your phone to install.
+and download `courtside-scoreboard-<version>-release.apk` from your chosen release, then open it on your phone to install.
 Android may ask you to allow installation from that source. Pre-releases may be experimental.
 If no release is available yet, see [how to build an APK](DEVELOPMENT.md#build-and-install).
 

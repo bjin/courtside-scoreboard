@@ -189,11 +189,13 @@ and pull requests targeting any branch. Checkouts fetch full history and tags fo
 1. **Tests:** all JVM tests, Android lint, and all instrumented tests on an Android 16/API 36
    emulator. Reports are uploaded even on failure when available.
 2. **Signed APK:** after tests pass, branch/tag pushes build and verify a signed release APK.
-   The run's artifact is named `courtside-release-<commit SHA>`. APK and test-report artifacts
-   are retained for 30 days. Pull requests run tests only and never receive signing secrets.
+   The run's artifact is named `courtside-release-<commit SHA>` and contains
+   `courtside-scoreboard-<versionName>-release.apk`. APK and test-report artifacts are retained
+   for 30 days. Pull requests run tests only and never receive signing secrets.
 3. **Publish:** only a `v*` tag push downloads that same verified APK, creates a GitHub
-   **pre-release** with generated notes, and attaches `app-release.apk`. The tag must already
-   exist on GitHub. Tag publishing remains pre-release-only until the release policy changes.
+   **pre-release** with generated notes, and attaches `courtside-scoreboard-<versionName>-release.apk`
+   (for example, `courtside-scoreboard-0.1.0-release.apk`). The tag must already exist on GitHub.
+   Tag publishing remains pre-release-only until the release policy changes.
    Only this job has `contents: write`; it receives no signing secrets and does not execute
    checked-out repository code. Branch pushes and pull requests do not create releases.
 

@@ -106,11 +106,16 @@ jobs:
       - name: Remove temporary signing keystore
         if: always()
         run: rm -f "$RUNNER_TEMP/courtside-release.keystore"
+      - name: Name release APK
+        run: |
+          version_name=$(jq -r '.elements[0].versionName' app/build/outputs/apk/release/output-metadata.json)
+          mkdir -p release-apk
+          cp app/build/outputs/apk/release/app-release.apk "release-apk/courtside-scoreboard-${version_name}-release.apk"
       - name: Upload release APK
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: courtside-release-${{ github.sha }}
-          path: app/build/outputs/apk/release/*.apk
+          path: release-apk/*.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -134,5 +139,5 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          gh release create "$RELEASE_TAG" release-apk/app-release.apk \
+          gh release create "$RELEASE_TAG" release-apk/*.apk \
             --verify-tag --title "$RELEASE_TAG" --generate-notes --prerelease
