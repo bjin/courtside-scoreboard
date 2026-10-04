@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+val releaseKeystore = providers.environmentVariable("COURTSIDE_RELEASE_KEYSTORE").orNull
+
 android {
     namespace = "io.github.bjin.courtside"
     compileSdk = 37
@@ -17,14 +19,24 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = file(releaseKeystore)
+                storePassword = providers.environmentVariable("COURTSIDE_RELEASE_STORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("COURTSIDE_RELEASE_KEY_ALIAS").get()
+                keyPassword = providers.environmentVariable("COURTSIDE_RELEASE_KEY_PASSWORD").get()
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Sideloaded personal app: sign release builds with the local debug key so
-            // `assembleRelease` yields an installable, optimised APK without keystore setup.
-            signingConfig = signingConfigs.getByName("debug")
+            // Local release builds are unsigned unless release credentials are provided.
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {

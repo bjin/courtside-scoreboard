@@ -10,6 +10,12 @@
 .externalNativeBuild/
 .cxx/
 
+# Signing credentials stay outside the repository.
+*.keystore
+*.jks
+*.p12
+*.pfx
+
 # UI text uses system fonts; never stage additional font binaries (including CJK).
 *.otf
 *.ttc
